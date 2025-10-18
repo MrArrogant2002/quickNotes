@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     // Create user using raw MongoDB query to avoid transaction requirement
     const now = new Date()
-    const result = await prisma.$runCommandRaw({
+    await prisma.$runCommandRaw({
       insert: "users",
       documents: [
         {

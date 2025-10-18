@@ -58,8 +58,8 @@ export async function GET(
       )
     }
 
-    // Remove userId from response
-    const { userId, ...noteData } = note
+    // Remove userId from response for security
+    const { userId: _userId, ...noteData } = note
 
     return NextResponse.json({ note: noteData }, { status: 200 })
   } catch (error) {

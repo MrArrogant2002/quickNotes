@@ -9,7 +9,6 @@ import {
   Sparkles, 
   Search, 
   Tag, 
-  Cloud, 
   Smartphone,
   ArrowRight,
   CheckCircle2

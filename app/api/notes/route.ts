@@ -11,7 +11,7 @@ const noteSchema = z.object({
 })
 
 // GET /api/notes - Get all notes for authenticated user
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const session = await auth()
 
