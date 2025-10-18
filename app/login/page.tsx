@@ -23,25 +23,35 @@ export default function LoginPage() {
     e.preventDefault()
     setIsLoading(true)
 
+    console.log("🔐 Login attempt started")
+    console.log("📧 Email:", formData.email)
+    console.log("🔑 Password length:", formData.password.length)
+
     try {
+      console.log("📡 Calling signIn...")
       const result = await signIn("credentials", {
         email: formData.email,
         password: formData.password,
         redirect: false,
       })
 
+      console.log("📥 SignIn result:", result)
+
       if (result?.error) {
+        console.error("❌ Login failed:", result.error)
         toast.error("Invalid email or password")
       } else if (result?.ok) {
+        console.log("✅ Login successful!")
         toast.success("Welcome back!")
         router.push("/dashboard")
         router.refresh()
       }
     } catch (error) {
-      console.error("Login error:", error)
+      console.error("💥 Login error:", error)
       toast.error("Something went wrong. Please try again.")
     } finally {
       setIsLoading(false)
+      console.log("🏁 Login attempt finished")
     }
   }
 
