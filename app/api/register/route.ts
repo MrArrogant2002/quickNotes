@@ -35,25 +35,13 @@ export async function POST(req: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(validatedData.password, 10)
 
-    // Create user using raw MongoDB query to avoid transaction requirement
-    const now = new Date()
-    await prisma.$runCommandRaw({
-      insert: "users",
-      documents: [
-        {
-          email: validatedData.email,
-          password: hashedPassword,
-          name: validatedData.name,
-          avatar: null,
-          createdAt: { $date: now.toISOString() },
-          updatedAt: { $date: now.toISOString() },
-        },
-      ],
-    })
-
-    // Fetch the created user
-    const user = await prisma.user.findUnique({
-      where: { email: validatedData.email },
+    // Create user - MongoDB Atlas supports this without replica set
+    const user = await prisma.user.create({
+      data: {
+        email: validatedData.email,
+        password: hashedPassword,
+        name: validatedData.name,
+      },
       select: {
         id: true,
         email: true,
@@ -61,6 +49,8 @@ export async function POST(req: NextRequest) {
         createdAt: true,
       },
     })
+
+    console.log("User created successfully:", user.email)
 
     return NextResponse.json(
       {
