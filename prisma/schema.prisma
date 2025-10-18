@@ -13,27 +13,82 @@ datasource db {
 
 // User model for authentication
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  email     String   @unique
-  password  String
-  name      String?
-  avatar    String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  email             String    @unique
+  password          String
+  name              String?
+  avatar            String?
+  emailVerified     Boolean   @default(false)
+  verificationToken String?
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   @@map("users")
 }
 
 // Note model with rich text support and tags
 model Note {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  content     String   // Will store rich text as HTML or JSON
+  tags        String[] // Array of tags for organization
+  userId      String   @db.ObjectId // Foreign key reference (no Prisma relation to avoid transactions)
+  categoryId  String?  @db.ObjectId // Optional category/folder
+  isPublic    Boolean  @default(false)
+  shareToken  String?  @unique // Token for sharing notes
+  sharedWith  String[] @default([]) // Array of user IDs with access
+  templateId  String?  @db.ObjectId // Reference to template if created from one
+  attachments Json[]   @default([]) // Array of attachment metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("notes")
+  @@index([userId])
+  @@index([categoryId])
+}
+
+// Category/Folder model
+model Category {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  content   String   // Will store rich text as HTML or JSON
-  tags      String[] // Array of tags for organization
-  userId    String   @db.ObjectId // Foreign key reference (no Prisma relation to avoid transactions)
+  name      String
+  color     String?  @default("#A6B1E1")
+  userId    String   @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("notes")
+  @@map("categories")
+  @@index([userId])
+}
+
+// Note Template model
+model Template {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  content   String
+  tags      String[] @default([])
+  userId    String?  @db.ObjectId // Null for system templates
+  isPublic  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("templates")
+  @@index([userId])
+}
+
+// Note Version/History model
+model NoteVersion {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  noteId    String   @db.ObjectId
+  title     String
+  content   String
+  tags      String[]
+  version   Int
+  userId    String   @db.ObjectId
+  createdAt DateTime @default(now())
+
+  @@map("note_versions")
+  @@index([noteId])
   @@index([userId])
 }

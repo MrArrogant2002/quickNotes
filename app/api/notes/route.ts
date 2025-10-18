@@ -8,6 +8,9 @@ const noteSchema = z.object({
   title: z.string().min(1, "Title is required").max(200, "Title too long"),
   content: z.string().min(1, "Content is required"),
   tags: z.array(z.string()).optional().default([]),
+  categoryId: z.string().optional(),
+  templateId: z.string().optional(),
+  attachments: z.array(z.any()).optional().default([]),
 })
 
 // GET /api/notes - Get all notes for authenticated user
@@ -73,6 +76,12 @@ export async function POST(req: NextRequest) {
           title: validatedData.title,
           content: validatedData.content,
           tags: validatedData.tags,
+          categoryId: validatedData.categoryId ? { $oid: validatedData.categoryId } : null,
+          templateId: validatedData.templateId ? { $oid: validatedData.templateId } : null,
+          attachments: validatedData.attachments || [],
+          isPublic: false,
+          shareToken: null,
+          sharedWith: [],
           userId: { $oid: session.user.id },
           createdAt: { $date: now.toISOString() },
           updatedAt: { $date: now.toISOString() },
@@ -94,6 +103,10 @@ export async function POST(req: NextRequest) {
         title: true,
         content: true,
         tags: true,
+        categoryId: true,
+        isPublic: true,
+        shareToken: true,
+        attachments: true,
         createdAt: true,
         updatedAt: true,
       },
