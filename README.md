@@ -1,5 +1,7 @@
 # QuickNotes 📝
 
+> **✨ Recently Updated!** This application has been optimized for production deployment with dark mode support, enhanced responsive design, and comprehensive Vercel deployment documentation. See [FIXES_SUMMARY.md](./FIXES_SUMMARY.md) for details.
+
 A modern, secure, and feature-rich note-taking application built with Next.js 15, MongoDB, and TipTap rich text editor.
 
 ![Next.js](https://img.shields.io/badge/Next.js-15.5.6-black)
@@ -7,6 +9,15 @@ A modern, secure, and feature-rich note-taking application built with Next.js 15
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
 ![MongoDB](https://img.shields.io/badge/MongoDB-7.0-green)
 ![Docker](https://img.shields.io/badge/Docker-Ready-blue)
+![Production Ready](https://img.shields.io/badge/Production-Ready-brightgreen)
+
+## 🆕 Recent Updates
+
+- 🌙 **Dark Mode Toggle** - Switch between light and dark themes
+- 📱 **Enhanced Responsive Design** - Better mobile experience
+- 🚀 **Vercel Deployment Ready** - Complete deployment guide included
+- 🔧 **All Build Errors Fixed** - Zero TypeScript/lint errors
+- 📚 **Comprehensive Documentation** - Deployment and configuration guides
 
 ## ✨ Features
 
@@ -40,10 +51,11 @@ A modern, secure, and feature-rich note-taking application built with Next.js 15
 
 ### 🎨 Modern UI/UX
 - Beautiful, responsive design with shadcn/ui components
-- Dark mode support
+- **🌙 Dark mode support with toggle button (NEW!)**
 - Toast notifications for user feedback
 - Smooth animations and transitions
 - Mobile-friendly interface
+- System theme detection
 
 ## 🚀 Tech Stack
 
@@ -243,14 +255,36 @@ The application has been thoroughly tested with:
 
 ## 🚢 Deployment
 
-### Vercel (Recommended for Next.js)
+### ⚡ Quick Deploy to Vercel (Recommended)
+
+**Prerequisites**: MongoDB Atlas account (free tier available)
+
+1. **Fork/Clone this repository**
+2. **Set up MongoDB Atlas** - [Quick Guide](https://www.mongodb.com/cloud/atlas/register)
+3. **Deploy to Vercel**:
+   - Connect your GitHub repository
+   - Add environment variables (see below)
+   - Click Deploy!
+
+**Required Environment Variables**:
+```env
+DATABASE_URL=mongodb+srv://username:password@cluster.mongodb.net/quicknotes
+NEXTAUTH_URL=https://your-app.vercel.app
+NEXTAUTH_SECRET=your-secret-here
+```
+
+📚 **Detailed Guide**: See [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md) for complete step-by-step instructions.
+
+### Traditional Deployment Options
+
+#### Vercel (Recommended for Next.js)
 
 1. Push your code to GitHub
 2. Import project in Vercel
 3. Add environment variables
 4. Deploy!
 
-### Docker Deployment
+#### Docker Deployment
 
 The application is Docker-ready and can be deployed to:
 - AWS ECS/Fargate
@@ -309,6 +343,22 @@ docker-compose down     # Stop Docker containers
 **Error**: Build fails
 - **Solution**: Run `docker-compose build --no-cache`
 
+## 📚 Documentation
+
+### Quick Links
+- 📘 [Getting Started](./README.md) - You are here!
+- 🚀 [Vercel Deployment Guide](./VERCEL_DEPLOYMENT.md) - Step-by-step deployment to Vercel
+- 📝 [Fixes & Improvements Summary](./FIXES_SUMMARY.md) - Recent updates and enhancements
+- 🐳 [Docker Setup](./DOCKER.md) - Docker configuration and deployment
+- 🧪 [Testing Documentation](./TESTING.md) - Testing guidelines
+- 🗂️ [Project Structure](./FILE_STRUCTURE_GUIDE.md) - Code organization guide
+
+### Configuration Files
+- `.env.example` - Environment variables template
+- `vercel.json` - Vercel deployment configuration
+- `docker-compose.yml` - Docker setup
+- `prisma/schema.prisma` - Database schema
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please:
@@ -335,26 +385,27 @@ This project is licensed under the MIT License.
 - [Prisma](https://www.prisma.io/) - Next-generation ORM
 - [NextAuth](https://next-auth.js.org/) - Authentication for Next.js
 
-## 📚 Documentation
-
-- [Getting Started](./README.md) - This file
-- [Docker Setup](./DOCKER.md) - Docker configuration and deployment
-- [MongoDB Fix](./MONGODB_FIX.md) - MongoDB replica set workaround
-- [Testing](./TESTING.md) - Testing documentation
-
 ## 🗺️ Roadmap
 
+### ✅ Completed
 - [x] User authentication
 - [x] Rich text editor
 - [x] Note CRUD operations
 - [x] Profile page
 - [x] Docker configuration
+- [x] **Dark/Light theme toggle** (NEW!)
+- [x] **Vercel deployment ready** (NEW!)
+- [x] **Enhanced responsive design** (NEW!)
+
+### 🚧 Planned Features
 - [ ] Note sharing and collaboration
 - [ ] Export notes (PDF, Markdown)
 - [ ] Note templates
-- [ ] Dark/Light theme toggle
+- [ ] Note version control
 - [ ] Mobile app (React Native)
-- [ ] Browser extension
+- [ ] Browser extension enhancements
+- [ ] Advanced search with filters
+- [ ] Collaborative editing
 
 ---
 
