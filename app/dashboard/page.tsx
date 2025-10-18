@@ -11,7 +11,7 @@ export default async function DashboardPage() {
   }
 
   // Fetch user's notes
-  const notes = await prisma.note.findMany({
+  const notesData = await prisma.note.findMany({
     where: {
       userId: session.user.id,
     },
@@ -27,6 +27,13 @@ export default async function DashboardPage() {
       updatedAt: true,
     },
   })
+
+  // Convert Date objects to strings for client component
+  const notes = notesData.map(note => ({
+    ...note,
+    createdAt: note.createdAt.toISOString(),
+    updatedAt: note.updatedAt.toISOString(),
+  }))
 
   return <DashboardClient notes={notes} user={session.user} />
 }

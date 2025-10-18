@@ -31,7 +31,7 @@ export default async function ProfilePage() {
     },
   })
 
-  const notes = await prisma.note.findMany({
+  const notesData = await prisma.note.findMany({
     where: {
       userId: session.user.id,
     },
@@ -48,13 +48,21 @@ export default async function ProfilePage() {
     },
   })
 
+  // Convert Date objects to strings for client component
+  const notes = notesData.map(note => ({
+    ...note,
+    createdAt: note.createdAt.toISOString(),
+    updatedAt: note.updatedAt.toISOString(),
+  }))
+
   if (!user) {
     redirect("/login")
   }
 
-  // Add notes count to user object
+  // Add notes count to user object and convert Date to string
   const userWithCount = {
     ...user,
+    createdAt: user.createdAt.toISOString(),
     _count: {
       notes: notesCount,
     },

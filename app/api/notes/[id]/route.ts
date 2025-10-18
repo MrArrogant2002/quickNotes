@@ -59,7 +59,8 @@ export async function GET(
     }
 
     // Remove userId from response for security
-    const { userId: _userId, ...noteData } = note
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { userId, ...noteData } = note
 
     return NextResponse.json({ note: noteData }, { status: 200 })
   } catch (error) {
