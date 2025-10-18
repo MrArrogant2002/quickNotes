@@ -23,6 +23,8 @@ export default async function DashboardPage() {
       title: true,
       content: true,
       tags: true,
+      isPublic: true,
+      shareToken: true,
       createdAt: true,
       updatedAt: true,
     },
