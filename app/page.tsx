@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { 
   FileText, 
   Lock, 
@@ -28,14 +29,15 @@ export default function HomePage() {
               QuickNotes
             </span>
           </div>
-          <div className="flex gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <ThemeToggle />
             <Link href="/login">
-              <Button variant="ghost" className="hover:bg-white/50 dark:hover:bg-white/10" aria-label="Sign in to your account">
+              <Button variant="ghost" className="hover:bg-white/50 dark:hover:bg-white/10 text-sm sm:text-base px-3 sm:px-4" aria-label="Sign in to your account">
                 Sign In
               </Button>
             </Link>
             <Link href="/register">
-              <Button className="bg-gradient-to-r from-[#A6B1E1] to-[#424874] hover:from-[#8B9FD9] hover:to-[#333561] text-white shadow-lg shadow-[#A6B1E1]/30" aria-label="Create a new account">
+              <Button className="bg-gradient-to-r from-[#A6B1E1] to-[#424874] hover:from-[#8B9FD9] hover:to-[#333561] text-white shadow-lg shadow-[#A6B1E1]/30 text-sm sm:text-base px-3 sm:px-4" aria-label="Create a new account">
                 Get Started
               </Button>
             </Link>

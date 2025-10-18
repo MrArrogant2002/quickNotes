@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { CreateNoteDialog } from "@/components/notes/create-note-dialog"
 import { NoteCard } from "@/components/notes/note-card"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { LogOut, Search, StickyNote, User } from "lucide-react"
 import { signOut } from "next-auth/react"
 import { toast } from "sonner"
@@ -106,7 +107,8 @@ export function DashboardClient({ notes: initialNotes, user }: DashboardClientPr
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <ThemeToggle />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
