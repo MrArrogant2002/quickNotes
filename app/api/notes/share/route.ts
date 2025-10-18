@@ -38,21 +38,12 @@ export async function POST(req: NextRequest) {
     // Generate a unique share token
     const shareToken = randomBytes(16).toString("hex")
     
-    const now = new Date()
-    await prisma.$runCommandRaw({
-      update: "notes",
-      updates: [
-        {
-          q: { _id: { $oid: noteId } },
-          u: {
-            $set: {
-              isPublic: isPublic ?? true,
-              shareToken: shareToken,
-              updatedAt: { $date: now.toISOString() },
-            },
-          },
-        },
-      ],
+    await prisma.note.update({
+      where: { id: noteId },
+      data: {
+        isPublic: isPublic ?? true,
+        shareToken: shareToken,
+      },
     })
 
     return NextResponse.json(
@@ -104,21 +95,12 @@ export async function DELETE(req: NextRequest) {
       )
     }
 
-    const now = new Date()
-    await prisma.$runCommandRaw({
-      update: "notes",
-      updates: [
-        {
-          q: { _id: { $oid: noteId } },
-          u: {
-            $set: {
-              isPublic: false,
-              shareToken: null,
-              updatedAt: { $date: now.toISOString() },
-            },
-          },
-        },
-      ],
+    await prisma.note.update({
+      where: { id: noteId },
+      data: {
+        isPublic: false,
+        shareToken: null,
+      },
     })
 
     return NextResponse.json(

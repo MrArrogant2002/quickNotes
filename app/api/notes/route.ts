@@ -64,30 +64,13 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const validatedData = noteSchema.parse(body)
 
-    // Create note using raw MongoDB query to avoid transaction requirement
-    const now = new Date()
-    await prisma.$runCommandRaw({
-      insert: "notes",
-      documents: [
-        {
-          title: validatedData.title,
-          content: validatedData.content,
-          tags: validatedData.tags,
-          userId: { $oid: session.user.id },
-          createdAt: { $date: now.toISOString() },
-          updatedAt: { $date: now.toISOString() },
-        },
-      ],
-    })
-
-    // Fetch the created note (get the most recent one for this user)
-    const note = await prisma.note.findFirst({
-      where: {
-        userId: session.user.id,
+    // Create note using Prisma
+    const note = await prisma.note.create({
+      data: {
         title: validatedData.title,
-      },
-      orderBy: {
-        createdAt: "desc",
+        content: validatedData.content,
+        tags: validatedData.tags,
+        userId: session.user.id,
       },
       select: {
         id: true,

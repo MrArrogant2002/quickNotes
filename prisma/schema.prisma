@@ -30,14 +30,33 @@ model User {
 
 // Note model with rich text support and tags
 model Note {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  content   String   // Will store rich text as HTML or JSON
-  tags      String[] // Array of tags for organization
-  userId    String   @db.ObjectId // Foreign key reference (no Prisma relation to avoid transactions)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  title      String
+  content    String   // Will store rich text as HTML or JSON
+  tags       String[] // Array of tags for organization
+  userId     String   @db.ObjectId // Foreign key reference (no Prisma relation to avoid transactions)
+  isPublic   Boolean  @default(false) // For sharing notes publicly
+  shareToken String?  // Token for shared note access
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@map("notes")
+  @@index([userId])
+  @@index([shareToken])
+}
+
+// NoteVersion model for version history
+model NoteVersion {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  noteId    String   @db.ObjectId // Reference to the note
+  title     String
+  content   String
+  tags      String[]
+  version   Int      // Version number
+  userId    String   @db.ObjectId // User who created this version
+  createdAt DateTime @default(now())
+
+  @@map("note_versions")
+  @@index([noteId])
   @@index([userId])
 }

@@ -94,20 +94,16 @@ export async function POST(req: NextRequest) {
 
     const nextVersion = (latestVersion?.version || 0) + 1
 
-    const now = new Date()
-    await prisma.$runCommandRaw({
-      insert: "note_versions",
-      documents: [
-        {
-          noteId: { $oid: noteId },
-          title: title || note.title,
-          content: content || note.content,
-          tags: tags || note.tags,
-          version: nextVersion,
-          userId: { $oid: session.user.id },
-          createdAt: { $date: now.toISOString() },
-        },
-      ],
+    // Create new version
+    await prisma.noteVersion.create({
+      data: {
+        noteId: noteId,
+        title: title || note.title,
+        content: content || note.content,
+        tags: tags || note.tags,
+        version: nextVersion,
+        userId: session.user.id,
+      },
     })
 
     return NextResponse.json(

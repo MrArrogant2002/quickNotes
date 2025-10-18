@@ -117,28 +117,16 @@ export async function PUT(
     const body = await req.json()
     const validatedData = noteUpdateSchema.parse(body)
 
-    // Use $runCommandRaw to update the note (avoid MongoDB replica set requirement)
-    const updateDoc: Record<string, unknown> = {
-      updatedAt: { $date: new Date().toISOString() },
-    }
+    // Update note using Prisma
+    const updateData: Record<string, unknown> = {}
     
-    if (validatedData.title !== undefined) updateDoc.title = validatedData.title
-    if (validatedData.content !== undefined) updateDoc.content = validatedData.content
-    if (validatedData.tags !== undefined) updateDoc.tags = validatedData.tags
+    if (validatedData.title !== undefined) updateData.title = validatedData.title
+    if (validatedData.content !== undefined) updateData.content = validatedData.content
+    if (validatedData.tags !== undefined) updateData.tags = validatedData.tags
 
-    await prisma.$runCommandRaw({
-      update: "notes",
-      updates: [
-        {
-          q: { _id: { $oid: id } },
-          u: { $set: updateDoc },
-        } as never,
-      ],
-    })
-
-    // Fetch the updated note
-    const note = await prisma.note.findUnique({
+    const note = await prisma.note.update({
       where: { id },
+      data: updateData,
       select: {
         id: true,
         title: true,
