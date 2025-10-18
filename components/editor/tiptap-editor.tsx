@@ -35,7 +35,7 @@ interface TiptapEditorProps {
 export function TiptapEditor({ content, onChange, placeholder = "Start writing..." }: TiptapEditorProps) {
   // Memoize the onChange callback to prevent unnecessary re-renders
   const handleUpdate = useCallback(
-    ({ editor }: any) => {
+    ({ editor }: { editor: { getHTML: () => string } }) => {
       onChange(editor.getHTML())
     },
     [onChange]

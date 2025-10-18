@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Calendar, FileText, Mail, User } from "lucide-react"
+import { ArrowLeft, Calendar, FileText, Mail } from "lucide-react"
 import { formatDistanceToNow, format } from "date-fns"
 
 interface Note {

@@ -154,7 +154,7 @@ export default function RegisterPage() {
               {/* Features List */}
               <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4 space-y-2">
                 <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                  What you'll get:
+                  What you&apos;ll get:
                 </p>
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
