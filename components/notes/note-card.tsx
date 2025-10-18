@@ -1,11 +1,12 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { MoreVertical, Edit, Trash2, Calendar, Loader2, Share2, Download, History } from "lucide-react"
+import { MoreVertical, Edit, Trash2, Calendar, Loader2 } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 
 interface NoteCardProps {
@@ -15,12 +16,7 @@ interface NoteCardProps {
   tags: string[]
   createdAt: string
   updatedAt: string
-  isPublic?: boolean
-  shareToken?: string | null
   onDelete?: (id: string) => void
-  onShare?: (id: string) => void
-  onExport?: (id: string, format: "markdown" | "pdf") => void
-  onViewHistory?: (id: string) => void
   isDeleting?: boolean
 }
 
@@ -38,23 +34,24 @@ function stripHtml(html: string): string {
     .replace(/&nbsp;/g, ' ')
 }
 
-export function NoteCard({ 
-  id, 
-  title, 
-  content, 
-  tags, 
-  updatedAt, 
-  isPublic,
-  // shareToken,
-  onDelete, 
-  onShare,
-  onExport,
-  onViewHistory,
-  isDeleting 
-}: NoteCardProps) {
+export function NoteCard({ id, title, content, tags, updatedAt, onDelete, isDeleting }: NoteCardProps) {
   // Strip HTML and truncate content for preview
   const plainText = stripHtml(content)
   const preview = plainText.length > 150 ? plainText.substring(0, 150) + "..." : plainText
+
+  // Use client-side only rendering for time to avoid hydration mismatch
+  const [timeAgo, setTimeAgo] = useState<string>("")
+
+  useEffect(() => {
+    setTimeAgo(formatDistanceToNow(new Date(updatedAt), { addSuffix: true }))
+    
+    // Optional: Update every minute
+    const interval = setInterval(() => {
+      setTimeAgo(formatDistanceToNow(new Date(updatedAt), { addSuffix: true }))
+    }, 60000) // 60 seconds
+
+    return () => clearInterval(interval)
+  }, [updatedAt])
 
   return (
     <Card className="group hover:shadow-2xl hover:shadow-[#A6B1E1]/10 transition-all duration-300 hover:-translate-y-1 border-slate-200/50 dark:border-slate-700/50 bg-white/80 dark:bg-gray-800/80 backdrop-blur overflow-hidden relative">
@@ -77,7 +74,7 @@ export function NoteCard({
             <CardDescription className="flex items-center gap-1 mt-2">
               <Calendar className="w-3.5 h-3.5" />
               <span className="text-xs">
-                Updated {formatDistanceToNow(new Date(updatedAt), { addSuffix: true })}
+                {timeAgo ? `Updated ${timeAgo}` : "Updated recently"}
               </span>
             </CardDescription>
           </div>
@@ -94,42 +91,6 @@ export function NoteCard({
                   Edit
                 </Link>
               </DropdownMenuItem>
-              {onShare && (
-                <DropdownMenuItem
-                  onClick={() => onShare(id)}
-                  className="cursor-pointer"
-                >
-                  <Share2 className="w-4 h-4 mr-2" />
-                  {isPublic ? "Manage Sharing" : "Share Note"}
-                </DropdownMenuItem>
-              )}
-              {onExport && (
-                <>
-                  <DropdownMenuItem
-                    onClick={() => onExport(id, "markdown")}
-                    className="cursor-pointer"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Export as Markdown
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => onExport(id, "pdf")}
-                    className="cursor-pointer"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Export as PDF
-                  </DropdownMenuItem>
-                </>
-              )}
-              {onViewHistory && (
-                <DropdownMenuItem
-                  onClick={() => onViewHistory(id)}
-                  className="cursor-pointer"
-                >
-                  <History className="w-4 h-4 mr-2" />
-                  View History
-                </DropdownMenuItem>
-              )}
               <DropdownMenuItem
                 onClick={() => onDelete?.(id)}
                 className="text-destructive focus:text-destructive cursor-pointer"

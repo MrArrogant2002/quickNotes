@@ -8,9 +8,6 @@ const noteUpdateSchema = z.object({
   title: z.string().min(1, "Title is required").max(200, "Title too long").optional(),
   content: z.string().min(1, "Content is required").optional(),
   tags: z.array(z.string()).optional(),
-  categoryId: z.string().optional().nullable(),
-  attachments: z.array(z.any()).optional(),
-  createVersion: z.boolean().optional().default(true),
 })
 
 // GET /api/notes/[id] - Get a single note
@@ -40,10 +37,6 @@ export async function GET(
         title: true,
         content: true,
         tags: true,
-        categoryId: true,
-        isPublic: true,
-        shareToken: true,
-        attachments: true,
         createdAt: true,
         updatedAt: true,
         userId: true,
@@ -104,9 +97,6 @@ export async function PUT(
       },
       select: {
         userId: true,
-        title: true,
-        content: true,
-        tags: true,
       },
     })
 
@@ -127,34 +117,6 @@ export async function PUT(
     const body = await req.json()
     const validatedData = noteUpdateSchema.parse(body)
 
-    // Create version if requested (default: true)
-    if (validatedData.createVersion !== false) {
-      // Get the next version number
-      const latestVersion = await prisma.noteVersion.findFirst({
-        where: { noteId: id },
-        orderBy: { version: "desc" },
-      })
-
-      const nextVersion = (latestVersion?.version || 0) + 1
-
-      // Save current version
-      const versionNow = new Date()
-      await prisma.$runCommandRaw({
-        insert: "note_versions",
-        documents: [
-          {
-            noteId: { $oid: id },
-            title: existingNote.title,
-            content: existingNote.content,
-            tags: existingNote.tags,
-            version: nextVersion,
-            userId: { $oid: session.user.id },
-            createdAt: { $date: versionNow.toISOString() },
-          },
-        ],
-      })
-    }
-
     // Use $runCommandRaw to update the note (avoid MongoDB replica set requirement)
     const updateDoc: Record<string, unknown> = {
       updatedAt: { $date: new Date().toISOString() },
@@ -163,10 +125,6 @@ export async function PUT(
     if (validatedData.title !== undefined) updateDoc.title = validatedData.title
     if (validatedData.content !== undefined) updateDoc.content = validatedData.content
     if (validatedData.tags !== undefined) updateDoc.tags = validatedData.tags
-    if (validatedData.categoryId !== undefined) {
-      updateDoc.categoryId = validatedData.categoryId ? { $oid: validatedData.categoryId } : null
-    }
-    if (validatedData.attachments !== undefined) updateDoc.attachments = validatedData.attachments
 
     await prisma.$runCommandRaw({
       update: "notes",
@@ -186,10 +144,6 @@ export async function PUT(
         title: true,
         content: true,
         tags: true,
-        categoryId: true,
-        isPublic: true,
-        shareToken: true,
-        attachments: true,
         createdAt: true,
         updatedAt: true,
       },

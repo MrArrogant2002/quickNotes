@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import dynamic from "next/dynamic"
 import { Button } from "@/components/ui/button"
@@ -51,6 +51,17 @@ export function NoteEditorClient({ note }: NoteEditorClientProps) {
   const [tagInput, setTagInput] = useState("")
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [timeAgo, setTimeAgo] = useState<string>("")
+
+  useEffect(() => {
+    setTimeAgo(formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true }))
+    
+    const interval = setInterval(() => {
+      setTimeAgo(formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true }))
+    }, 60000)
+
+    return () => clearInterval(interval)
+  }, [note.updatedAt])
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -250,7 +261,7 @@ export function NoteEditorClient({ note }: NoteEditorClientProps) {
               {/* Metadata */}
               <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
                 <span className="font-medium">
-                  Last updated {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
+                  {timeAgo ? `Last updated ${timeAgo}` : "Last updated recently"}
                 </span>
               </div>
             </div>

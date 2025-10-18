@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -32,6 +33,27 @@ interface ProfileUser {
 interface ProfileClientProps {
   user: ProfileUser
   notes: Note[]
+}
+
+// Separate component for time display to avoid hydration issues
+function NoteTimeDisplay({ updatedAt }: { updatedAt: string }) {
+  const [timeAgo, setTimeAgo] = useState<string>("")
+
+  useEffect(() => {
+    setTimeAgo(formatDistanceToNow(new Date(updatedAt), { addSuffix: true }))
+    
+    const interval = setInterval(() => {
+      setTimeAgo(formatDistanceToNow(new Date(updatedAt), { addSuffix: true }))
+    }, 60000)
+
+    return () => clearInterval(interval)
+  }, [updatedAt])
+
+  return (
+    <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
+      {timeAgo ? `Updated ${timeAgo}` : "Updated recently"}
+    </p>
+  )
 }
 
 // Helper function to strip HTML tags and get plain text
@@ -165,9 +187,7 @@ export function ProfileClient({ user, notes }: ProfileClientProps) {
                               {note.title}
                             </CardTitle>
                           </Link>
-                          <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
-                            Updated {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
-                          </p>
+                          <NoteTimeDisplay updatedAt={note.updatedAt} />
                         </div>
                       </div>
                     </CardHeader>

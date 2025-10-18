@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
-import { randomBytes } from "crypto"
 
 // Validation schema for registration
 const registerSchema = z.object({
@@ -36,17 +35,12 @@ export async function POST(req: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(validatedData.password, 10)
 
-    // Generate email verification token
-    const verificationToken = randomBytes(32).toString("hex")
-
     // Create user - MongoDB Atlas supports this without replica set
     const user = await prisma.user.create({
       data: {
         email: validatedData.email,
         password: hashedPassword,
         name: validatedData.name,
-        verificationToken: verificationToken,
-        emailVerified: false,
       },
       select: {
         id: true,
@@ -57,17 +51,11 @@ export async function POST(req: NextRequest) {
     })
 
     console.log("User created successfully:", user.email)
-    console.log(`Verification link: ${process.env.NEXTAUTH_URL}/verify-email?token=${verificationToken}`)
-
-    // TODO: Send verification email
-    // await sendVerificationEmail(user.email, verificationToken)
 
     return NextResponse.json(
       {
-        message: "User created successfully. Please check your email for verification.",
+        message: "User created successfully",
         user,
-        // For development only - remove in production
-        verificationToken: process.env.NODE_ENV === "development" ? verificationToken : undefined,
       },
       { status: 201 }
     )
