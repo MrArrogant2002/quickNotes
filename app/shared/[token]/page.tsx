@@ -1,7 +1,7 @@
-import { notFound } from "next/navigation"
-import { prisma } from "@/lib/prisma"
-import { format } from "date-fns"
 import Link from "next/link"
+
+// TODO: Implement note sharing feature - requires shareToken and isPublic fields in Note model
+// Temporarily disabled to make the app deployable
 
 export default async function SharedNotePage({
   params,
@@ -10,67 +10,32 @@ export default async function SharedNotePage({
 }) {
   const { token } = await params
 
-  const note = await prisma.note.findFirst({
-    where: {
-      shareToken: token,
-      isPublic: true,
-    },
-    select: {
-      id: true,
-      title: true,
-      content: true,
-      tags: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  })
-
-  if (!note) {
-    notFound()
-  }
-
+  // Feature temporarily disabled
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F4EEFF] via-[#DCD6F7] to-[#A6B1E1]   ">
+    <div className="min-h-screen bg-gradient-to-br from-[#F4EEFF] via-[#DCD6F7] to-[#A6B1E1]">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white/90  backdrop-blur rounded-xl shadow-xl p-8">
-            <div className="mb-6">
-              <h1 className="text-4xl font-bold mb-2 text-slate-900 ">
-                {note.title}
+          <div className="bg-white/90 backdrop-blur rounded-xl shadow-xl p-8">
+            <div className="mb-6 text-center">
+              <h1 className="text-4xl font-bold mb-4 text-slate-900">
+                Note Sharing Coming Soon
               </h1>
-              <div className="flex items-center gap-4 text-sm text-slate-600 ">
-                <span>Created: {format(new Date(note.createdAt), "MMM d, yyyy")}</span>
-                <span>•</span>
-                <span>Updated: {format(new Date(note.updatedAt), "MMM d, yyyy")}</span>
-              </div>
+              <p className="text-slate-600 mb-6">
+                The note sharing feature is currently under development.
+              </p>
+              <p className="text-sm text-slate-500">
+                Share Token: {token}
+              </p>
             </div>
 
-            {note.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-6">
-                {note.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1 bg-[#E4E1F6]  text-[#424874]  rounded-full text-sm font-medium"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            <div
-              className="prose  max-w-none"
-              dangerouslySetInnerHTML={{ __html: note.content }}
-            />
-          </div>
-
-          <div className="mt-6 text-center text-sm text-slate-600 ">
-            <p>
-              This note was shared via{" "}
-              <Link href="/" className="font-semibold text-[#424874]  hover:underline">
-                QuickNotes
+            <div className="mt-6 text-center">
+              <Link 
+                href="/" 
+                className="inline-block px-6 py-3 bg-gradient-to-r from-[#A6B1E1] to-[#424874] text-white rounded-lg hover:from-[#8B9FD9] hover:to-[#333561] transition-all"
+              >
+                Go to Home
               </Link>
-            </p>
+            </div>
           </div>
         </div>
       </div>

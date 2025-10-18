@@ -1,9 +1,11 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+
+// TODO: Implement version control feature - requires NoteVersion model in Prisma schema
+// Temporarily disabled to make the app deployable
 
 // GET /api/notes/versions?noteId=xxx - Get all versions for a note
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const session = await auth()
 
@@ -14,37 +16,11 @@ export async function GET(req: NextRequest) {
       )
     }
 
-    const searchParams = req.nextUrl.searchParams
-    const noteId = searchParams.get("noteId")
-
-    if (!noteId) {
-      return NextResponse.json(
-        { error: "Note ID is required" },
-        { status: 400 }
-      )
-    }
-
-    const note = await prisma.note.findUnique({
-      where: { id: noteId },
-    })
-
-    if (!note || note.userId !== session.user.id) {
-      return NextResponse.json(
-        { error: "Note not found" },
-        { status: 404 }
-      )
-    }
-
-    const versions = await prisma.noteVersion.findMany({
-      where: {
-        noteId: noteId,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    })
-
-    return NextResponse.json({ versions }, { status: 200 })
+    // Feature temporarily disabled
+    return NextResponse.json(
+      { error: "Version control feature coming soon", versions: [] },
+      { status: 501 }
+    )
   } catch (error) {
     console.error("Error fetching note versions:", error)
     return NextResponse.json(
@@ -55,7 +31,7 @@ export async function GET(req: NextRequest) {
 }
 
 // POST /api/notes/versions - Create a new version (automatically on update)
-export async function POST(req: NextRequest) {
+export async function POST() {
   try {
     const session = await auth()
 
@@ -66,53 +42,10 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const { noteId, title, content, tags } = await req.json()
-
-    if (!noteId) {
-      return NextResponse.json(
-        { error: "Note ID is required" },
-        { status: 400 }
-      )
-    }
-
-    const note = await prisma.note.findUnique({
-      where: { id: noteId },
-    })
-
-    if (!note || note.userId !== session.user.id) {
-      return NextResponse.json(
-        { error: "Note not found" },
-        { status: 404 }
-      )
-    }
-
-    // Get the next version number
-    const latestVersion = await prisma.noteVersion.findFirst({
-      where: { noteId },
-      orderBy: { version: "desc" },
-    })
-
-    const nextVersion = (latestVersion?.version || 0) + 1
-
-    const now = new Date()
-    await prisma.$runCommandRaw({
-      insert: "note_versions",
-      documents: [
-        {
-          noteId: { $oid: noteId },
-          title: title || note.title,
-          content: content || note.content,
-          tags: tags || note.tags,
-          version: nextVersion,
-          userId: { $oid: session.user.id },
-          createdAt: { $date: now.toISOString() },
-        },
-      ],
-    })
-
+    // Feature temporarily disabled
     return NextResponse.json(
-      { message: "Version created successfully", version: nextVersion },
-      { status: 201 }
+      { error: "Version control feature coming soon" },
+      { status: 501 }
     )
   } catch (error) {
     console.error("Error creating version:", error)

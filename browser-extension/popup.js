@@ -1,7 +1,6 @@
 // QuickNotes Browser Extension - Popup Script
 
 let apiUrl = 'http://localhost:3000';
-let authToken = null;
 
 // DOM Elements
 const loggedInSection = document.querySelector('.logged-in');
@@ -26,7 +25,6 @@ async function checkLoginStatus() {
   }
   
   if (storage.authToken) {
-    authToken = storage.authToken;
     showLoggedIn();
   } else {
     showLoggedOut();
@@ -53,7 +51,6 @@ async function handleLogin() {
     // For demo purposes, we'll store credentials
     // In production, use proper OAuth or session tokens
     const credentials = btoa(`${email}:${password}`);
-    authToken = credentials;
 
     await chrome.storage.local.set({ 
       authToken: credentials,
@@ -122,7 +119,6 @@ async function handleSaveNote() {
 
 function handleLogout() {
   chrome.storage.local.remove(['authToken', 'email']);
-  authToken = null;
   showLoggedOut();
   showSuccess('Logged out successfully!');
 }
