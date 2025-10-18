@@ -40,22 +40,14 @@ export async function POST(req: NextRequest) {
     // Hash new password
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    const now = new Date()
-    await prisma.$runCommandRaw({
-      update: "users",
-      updates: [
-        {
-          q: { _id: { $oid: user.id } },
-          u: {
-            $set: {
-              password: hashedPassword,
-              resetToken: null,
-              resetTokenExpiry: null,
-              updatedAt: { $date: now.toISOString() },
-            },
-          },
-        },
-      ],
+    // Update password and clear reset token
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        resetToken: null,
+        resetTokenExpiry: null,
+      },
     })
 
     return NextResponse.json(

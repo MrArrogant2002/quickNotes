@@ -30,21 +30,13 @@ export async function POST(req: NextRequest) {
     const resetToken = randomBytes(32).toString("hex")
     const resetTokenExpiry = new Date(Date.now() + 3600000) // 1 hour
 
-    const now = new Date()
-    await prisma.$runCommandRaw({
-      update: "users",
-      updates: [
-        {
-          q: { _id: { $oid: user.id } },
-          u: {
-            $set: {
-              resetToken: resetToken,
-              resetTokenExpiry: { $date: resetTokenExpiry.toISOString() },
-              updatedAt: { $date: now.toISOString() },
-            },
-          },
-        },
-      ],
+    // Update user with reset token
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        resetToken: resetToken,
+        resetTokenExpiry: resetTokenExpiry,
+      },
     })
 
     // In production, send email here
