@@ -34,23 +34,25 @@ export function NoteCard({ id, title, content, tags, updatedAt, onDelete }: Note
   const preview = plainText.length > 150 ? plainText.substring(0, 150) + "..." : plainText
 
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card className="group hover:shadow-2xl hover:shadow-[#A6B1E1]/10 transition-all duration-300 hover:-translate-y-1 border-slate-200/50 dark:border-slate-700/50 bg-white/80 dark:bg-gray-800/80 backdrop-blur overflow-hidden">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <Link href={`/notes/${id}`}>
-              <CardTitle className="hover:text-primary cursor-pointer line-clamp-1">
+              <CardTitle className="hover:text-[#424874] dark:hover:text-[#A6B1E1] cursor-pointer line-clamp-1 text-lg font-bold transition-colors">
                 {title}
               </CardTitle>
             </Link>
-            <CardDescription className="flex items-center gap-1 mt-1">
-              <Calendar className="w-3 h-3" />
-              Updated {formatDistanceToNow(new Date(updatedAt), { addSuffix: true })}
+            <CardDescription className="flex items-center gap-1 mt-2">
+              <Calendar className="w-3.5 h-3.5" />
+              <span className="text-xs">
+                Updated {formatDistanceToNow(new Date(updatedAt), { addSuffix: true })}
+              </span>
             </CardDescription>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
                 <MoreVertical className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -74,14 +76,17 @@ export function NoteCard({ id, title, content, tags, updatedAt, onDelete }: Note
       </CardHeader>
       <CardContent>
         <Link href={`/notes/${id}`}>
-          <p className="text-sm text-muted-foreground mb-3 line-clamp-3 cursor-pointer">
+          <p className="text-sm text-slate-600 dark:text-slate-300 mb-3 line-clamp-3 cursor-pointer leading-relaxed">
             {preview}
           </p>
         </Link>
         {tags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1.5">
             {tags.map((tag) => (
-              <Badge key={tag} variant="secondary" className="text-xs">
+              <Badge 
+                key={tag} 
+                className="text-xs px-2 py-0.5 bg-[#DCD6F7] text-[#424874] dark:bg-blue-900 dark:text-[#A6B1E1] border-0 hover:bg-[#F4EEFF] dark:hover:bg-blue-800 transition-colors"
+              >
                 {tag}
               </Badge>
             ))}

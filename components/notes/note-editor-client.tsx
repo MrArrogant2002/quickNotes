@@ -124,23 +124,25 @@ export function NoteEditorClient({ note }: NoteEditorClientProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-[#F4EEFF] via-[#DCD6F7] to-[#A6B1E1] dark:from-gray-900 dark:via-[#424874] dark:to-gray-950">
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-8 animate-fade-in">
           <Button
             variant="ghost"
             onClick={() => router.push("/dashboard")}
+            className="hover:bg-white/50 dark:hover:bg-white/10"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
           </Button>
 
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <Button
               variant="destructive"
               onClick={handleDelete}
               disabled={isDeleting}
+              className="shadow-lg"
             >
               <Trash2 className="w-4 h-4 mr-2" />
               {isDeleting ? "Deleting..." : "Delete"}
@@ -149,37 +151,41 @@ export function NoteEditorClient({ note }: NoteEditorClientProps) {
             <Button
               onClick={handleSave}
               disabled={isSaving}
+              className="bg-gradient-to-r from-[#A6B1E1] to-[#424874] hover:from-[#8B9FD9] hover:to-[#333561] text-white shadow-lg shadow-[#A6B1E1]/30"
             >
               <Save className="w-4 h-4 mr-2" />
-              {isSaving ? "Saving..." : "Save"}
+              {isSaving ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         </div>
 
         {/* Note Editor Card */}
-        <Card>
-          <CardHeader>
-            <div className="space-y-4">
+        <Card className="border-slate-200/50 dark:border-slate-700/50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-2xl animate-fade-in" style={{ animationDelay: '0.1s' }}>
+          <CardHeader className="border-b border-slate-200 dark:border-slate-700">
+            <div className="space-y-6">
               {/* Title */}
               <Input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Note title..."
-                className="text-2xl font-bold border-0 focus-visible:ring-0 px-0"
+                className="text-3xl font-bold border-0 focus-visible:ring-0 px-0 placeholder:text-slate-400"
               />
 
               {/* Tags */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex flex-wrap gap-2">
                   {tags.map((tag) => (
-                    <Badge key={tag} className="pl-2 pr-1">
+                    <Badge 
+                      key={tag} 
+                      className="pl-3 pr-2 py-1.5 bg-[#DCD6F7] text-[#424874] dark:bg-blue-900 dark:text-[#A6B1E1] border-0 text-sm"
+                    >
                       {tag}
                       <button
                         type="button"
                         onClick={() => removeTag(tag)}
-                        className="ml-1 hover:text-destructive"
+                        className="ml-2 hover:text-destructive transition-colors"
                       >
-                        <X className="w-3 h-3" />
+                        <X className="w-3.5 h-3.5" />
                       </button>
                     </Badge>
                   ))}
@@ -191,12 +197,13 @@ export function NoteEditorClient({ note }: NoteEditorClientProps) {
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={handleTagKeyDown}
                     placeholder="Add a tag..."
-                    className="flex-1"
+                    className="flex-1 h-10 border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500/50"
                   />
                   <Button
                     type="button"
                     variant="outline"
                     onClick={addTag}
+                    className="px-6"
                   >
                     Add Tag
                   </Button>
@@ -204,13 +211,15 @@ export function NoteEditorClient({ note }: NoteEditorClientProps) {
               </div>
 
               {/* Metadata */}
-              <div className="text-sm text-muted-foreground">
-                Last updated {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
+              <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
+                <span className="font-medium">
+                  Last updated {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}
+                </span>
               </div>
             </div>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="pt-6">
             {/* TipTap Editor */}
             <TiptapEditor
               content={content}

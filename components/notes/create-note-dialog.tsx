@@ -74,22 +74,27 @@ export function CreateNoteDialog({ onNoteCreated }: CreateNoteDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="lg">
+        <Button 
+          size="lg" 
+          className="bg-gradient-to-r from-[#A6B1E1] to-[#424874] hover:from-[#8B9FD9] hover:to-[#333561] text-white shadow-lg shadow-[#A6B1E1]/30 hover:shadow-[#A6B1E1]/50 transition-all duration-300 hover:scale-105 h-12"
+        >
           <Plus className="w-5 h-5 mr-2" />
           Create Note
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[650px] bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-slate-200 dark:border-slate-700">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Create New Note</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-[#A6B1E1] to-[#424874] bg-clip-text text-transparent">
+              Create New Note
+            </DialogTitle>
+            <DialogDescription className="text-slate-600 dark:text-slate-400">
               Add a new note to your collection. You can organize it with tags.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-5 py-6">
             <div className="space-y-2">
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title" className="text-sm font-semibold">Title</Label>
               <Input
                 id="title"
                 placeholder="Enter note title..."
@@ -97,10 +102,11 @@ export function CreateNoteDialog({ onNoteCreated }: CreateNoteDialogProps) {
                 onChange={(e) => setTitle(e.target.value)}
                 required
                 disabled={isLoading}
+                className="h-11 border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500/50"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="content">Content</Label>
+              <Label htmlFor="content" className="text-sm font-semibold">Content</Label>
               <Textarea
                 id="content"
                 placeholder="Write your note content..."
@@ -109,10 +115,11 @@ export function CreateNoteDialog({ onNoteCreated }: CreateNoteDialogProps) {
                 required
                 disabled={isLoading}
                 rows={6}
+                className="border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500/50 resize-none"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="tags">Tags</Label>
+              <Label htmlFor="tags" className="text-sm font-semibold">Tags (Optional)</Label>
               <div className="flex gap-2">
                 <Input
                   id="tags"
@@ -126,28 +133,33 @@ export function CreateNoteDialog({ onNoteCreated }: CreateNoteDialogProps) {
                     }
                   }}
                   disabled={isLoading}
+                  className="h-10 border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500/50"
                 />
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleAddTag}
                   disabled={isLoading || !tagInput.trim()}
+                  className="px-4"
                 >
                   Add
                 </Button>
               </div>
               {tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="flex flex-wrap gap-2 mt-3">
                   {tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="pl-2 pr-1">
+                    <Badge 
+                      key={tag} 
+                      className="pl-3 pr-2 py-1.5 bg-[#DCD6F7] text-[#424874] dark:bg-blue-900 dark:text-[#A6B1E1] border-0 text-sm"
+                    >
                       {tag}
                       <button
                         type="button"
                         onClick={() => handleRemoveTag(tag)}
-                        className="ml-1 hover:text-destructive"
+                        className="ml-2 hover:text-destructive transition-colors"
                         disabled={isLoading}
                       >
-                        <X className="w-3 h-3" />
+                        <X className="w-3.5 h-3.5" />
                       </button>
                     </Badge>
                   ))}
@@ -155,16 +167,21 @@ export function CreateNoteDialog({ onNoteCreated }: CreateNoteDialogProps) {
               )}
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
               disabled={isLoading}
+              className="px-6"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button 
+              type="submit" 
+              disabled={isLoading}
+              className="bg-gradient-to-r from-[#A6B1E1] to-[#424874] hover:from-[#8B9FD9] hover:to-[#333561] text-white px-6"
+            >
               {isLoading ? "Creating..." : "Create Note"}
             </Button>
           </DialogFooter>
