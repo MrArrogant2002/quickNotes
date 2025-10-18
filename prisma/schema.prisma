@@ -1,0 +1,39 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+  // Note: relationMode is not needed for MongoDB
+}
+
+// User model for authentication
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  password  String
+  name      String?
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+// Note model with rich text support and tags
+model Note {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  content   String   // Will store rich text as HTML or JSON
+  tags      String[] // Array of tags for organization
+  userId    String   @db.ObjectId // Foreign key reference (no Prisma relation to avoid transactions)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("notes")
+  @@index([userId])
+}

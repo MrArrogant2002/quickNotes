@@ -1,0 +1,32 @@
+import { redirect } from "next/navigation"
+import { auth } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
+import { DashboardClient } from "@/components/notes/dashboard-client"
+
+export default async function DashboardPage() {
+  const session = await auth()
+
+  if (!session?.user) {
+    redirect("/login")
+  }
+
+  // Fetch user's notes
+  const notes = await prisma.note.findMany({
+    where: {
+      userId: session.user.id,
+    },
+    orderBy: {
+      updatedAt: "desc",
+    },
+    select: {
+      id: true,
+      title: true,
+      content: true,
+      tags: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  })
+
+  return <DashboardClient notes={notes} user={session.user} />
+}
