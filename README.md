@@ -15,6 +15,8 @@ A modern, secure, and feature-rich note-taking application built with Next.js 15
 - JWT-based session management (30-day expiration)
 - Password hashing with bcrypt (10 salt rounds)
 - Protected routes and API endpoints
+- **Email verification system** ✨
+- **Password reset functionality** ✨
 
 ### 📝 Rich Text Editing
 - Full WYSIWYG editor powered by TipTap
@@ -28,6 +30,12 @@ A modern, secure, and feature-rich note-taking application built with Next.js 15
 ### 📚 Note Management
 - Create, read, update, and delete notes
 - Tag organization system
+- **Categories/Folders for organizing notes** ✨
+- **Note templates for quick creation** ✨
+- **Note versioning and history tracking** ✨
+- **Share notes with public links** ✨
+- **Export notes as Markdown or PDF** ✨
+- **File attachments support (schema ready)** ✨
 - Search functionality across titles, content, and tags
 - Responsive grid layout
 - Last updated timestamps
@@ -40,10 +48,21 @@ A modern, secure, and feature-rich note-taking application built with Next.js 15
 
 ### 🎨 Modern UI/UX
 - Beautiful, responsive design with shadcn/ui components
-- Dark mode support
+- **Dark mode support with theme toggle** ✨
 - Toast notifications for user feedback
 - Smooth animations and transitions
 - Mobile-friendly interface
+
+### 🌐 Browser Extension
+- **Complete Chrome/Firefox extension** ✨
+- Quick note capture from any webpage
+- Context menu and keyboard shortcuts
+- Automatic source URL capture
+
+### 🔄 Collaboration (Coming Soon)
+- Share notes with read-only public links ✅
+- Foundation for real-time collaborative editing
+- User access control via `sharedWith` array
 
 ## 🚀 Tech Stack
 
@@ -349,12 +368,19 @@ This project is licensed under the MIT License.
 - [x] Note CRUD operations
 - [x] Profile page
 - [x] Docker configuration
-- [ ] Note sharing and collaboration
-- [ ] Export notes (PDF, Markdown)
-- [ ] Note templates
-- [ ] Dark/Light theme toggle
+- [x] Dark/Light theme toggle
+- [x] Note sharing and collaboration (public links)
+- [x] Export notes (PDF, Markdown)
+- [x] Note templates
+- [x] Categories/folders for notes
+- [x] Note versioning/history
+- [x] Email verification
+- [x] Password reset functionality
+- [x] Browser extension
+- [x] File attachments support (schema ready)
+- [ ] Real-time collaborative editing (needs WebSocket layer)
+- [ ] MongoDB Atlas Search (needs Atlas configuration)
 - [ ] Mobile app (React Native)
-- [ ] Browser extension
 
 ---
 

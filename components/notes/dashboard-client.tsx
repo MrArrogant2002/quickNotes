@@ -7,16 +7,27 @@ import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { CreateNoteDialog } from "@/components/notes/create-note-dialog"
+import { CreateCategoryDialog } from "@/components/categories/create-category-dialog"
 import { NoteCard } from "@/components/notes/note-card"
-import { LogOut, Search, StickyNote, User } from "lucide-react"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { LogOut, Search, StickyNote, User, Copy, X } from "lucide-react"
 import { signOut } from "next-auth/react"
 import { toast } from "sonner"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 interface Note {
   id: string
   title: string
   content: string
   tags: string[]
+  isPublic?: boolean
+  shareToken?: string | null
   createdAt: string
   updatedAt: string
 }
@@ -35,6 +46,9 @@ export function DashboardClient({ notes: initialNotes, user }: DashboardClientPr
   const [notes, setNotes] = useState<Note[]>(initialNotes)
   const [searchQuery, setSearchQuery] = useState("")
   const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null)
+  const [shareDialogOpen, setShareDialogOpen] = useState(false)
+  const [shareNote, setShareNote] = useState<Note | null>(null)
+  const [shareUrl, setShareUrl] = useState("")
 
   const handleNoteCreated = () => {
     router.refresh()
@@ -69,6 +83,117 @@ export function DashboardClient({ notes: initialNotes, user }: DashboardClientPr
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: "/" })
+  }
+
+  const handleShareNote = async (noteId: string) => {
+    const note = notes.find(n => n.id === noteId)
+    if (!note) return
+
+    if (note.shareToken) {
+      // Already shared, show existing link
+      setShareUrl(`${window.location.origin}/shared/${note.shareToken}`)
+      setShareNote(note)
+      setShareDialogOpen(true)
+    } else {
+      // Generate new share link
+      try {
+        const response = await fetch("/api/notes/share", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ noteId, isPublic: true }),
+        })
+
+        if (!response.ok) {
+          toast.error("Failed to generate share link")
+          return
+        }
+
+        const data = await response.json()
+        setShareUrl(data.shareUrl)
+        setShareNote(note)
+        setShareDialogOpen(true)
+        
+        // Update local state
+        setNotes(notes.map(n => 
+          n.id === noteId 
+            ? { ...n, isPublic: true, shareToken: data.shareToken }
+            : n
+        ))
+        
+        toast.success("Share link generated!")
+      } catch (error) {
+        console.error("Error sharing note:", error)
+        toast.error("Something went wrong")
+      }
+    }
+  }
+
+  const handleRemoveShare = async () => {
+    if (!shareNote) return
+
+    try {
+      const response = await fetch("/api/notes/share", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ noteId: shareNote.id }),
+      })
+
+      if (!response.ok) {
+        toast.error("Failed to remove share link")
+        return
+      }
+
+      // Update local state
+      setNotes(notes.map(n => 
+        n.id === shareNote.id 
+          ? { ...n, isPublic: false, shareToken: null }
+          : n
+      ))
+      
+      setShareDialogOpen(false)
+      setShareNote(null)
+      setShareUrl("")
+      toast.success("Share link removed")
+    } catch (error) {
+      console.error("Error removing share:", error)
+      toast.error("Something went wrong")
+    }
+  }
+
+  const handleCopyShareLink = () => {
+    navigator.clipboard.writeText(shareUrl)
+    toast.success("Link copied to clipboard!")
+  }
+
+  const handleExportNote = async (noteId: string, format: "markdown" | "pdf") => {
+    try {
+      const response = await fetch(`/api/notes/export?noteId=${noteId}&format=${format}`)
+      
+      if (!response.ok) {
+        toast.error("Failed to export note")
+        return
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `note-${noteId}.${format === "markdown" ? "md" : "html"}`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      
+      toast.success(`Note exported as ${format.toUpperCase()}`)
+    } catch (error) {
+      console.error("Error exporting note:", error)
+      toast.error("Something went wrong")
+    }
+  }
+
+  const handleViewHistory = (noteId: string) => {
+    // Navigate to note page where history can be viewed
+    router.push(`/notes/${noteId}?tab=history`)
   }
 
   // Filter notes based on search query
@@ -107,6 +232,7 @@ export function DashboardClient({ notes: initialNotes, user }: DashboardClientPr
               </div>
             </div>
             <div className="flex items-center gap-4">
+              <ThemeToggle />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-11 w-11 rounded-full hover:ring-2 hover:ring-[#A6B1E1]/50 transition-all">
@@ -154,7 +280,10 @@ export function DashboardClient({ notes: initialNotes, user }: DashboardClientPr
               className="pl-12 h-12 text-base border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-[#A6B1E1]/50 bg-white/80 dark:bg-gray-800/80 backdrop-blur"
             />
           </div>
-          <CreateNoteDialog onNoteCreated={handleNoteCreated} />
+          <div className="flex gap-2">
+            <CreateCategoryDialog onCategoryCreated={() => router.refresh()} />
+            <CreateNoteDialog onNoteCreated={handleNoteCreated} />
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -225,6 +354,9 @@ export function DashboardClient({ notes: initialNotes, user }: DashboardClientPr
                 <NoteCard
                   {...note}
                   onDelete={handleDeleteNote}
+                  onShare={handleShareNote}
+                  onExport={handleExportNote}
+                  onViewHistory={handleViewHistory}
                   isDeleting={deletingNoteId === note.id}
                 />
               </div>
@@ -232,6 +364,50 @@ export function DashboardClient({ notes: initialNotes, user }: DashboardClientPr
           </div>
         )}
       </main>
+
+      {/* Share Dialog */}
+      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Share Note</DialogTitle>
+            <DialogDescription>
+              Anyone with this link can view this note.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Input
+                value={shareUrl}
+                readOnly
+                className="flex-1"
+              />
+              <Button
+                size="icon"
+                onClick={handleCopyShareLink}
+                className="shrink-0"
+              >
+                <Copy className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="flex justify-between gap-2">
+              <Button
+                variant="outline"
+                onClick={handleRemoveShare}
+                className="text-destructive"
+              >
+                <X className="w-4 h-4 mr-2" />
+                Remove Share Link
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setShareDialogOpen(false)}
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
