@@ -90,18 +90,18 @@ export function DashboardClient({ notes: initialNotes, user }: DashboardClientPr
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F4EEFF] via-[#DCD6F7] to-[#A6B1E1] dark:from-gray-900 dark:via-[#424874] dark:to-gray-950">
       {/* Header */}
-      <header className="border-b border-slate-200/50 dark:border-slate-800/50 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl sticky top-0 z-10 shadow-sm">
-        <div className="container mx-auto px-4 py-4">
+      <header className="border-b border-slate-200/50 dark:border-slate-800/50 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl sticky top-0 z-10 shadow-sm" role="banner">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-[#A6B1E1] to-[#424874] rounded-lg flex items-center justify-center shadow-lg shadow-[#A6B1E1]/30">
+              <div className="w-10 h-10 bg-gradient-to-br from-[#A6B1E1] to-[#424874] rounded-lg flex items-center justify-center shadow-lg shadow-[#A6B1E1]/30" aria-hidden="true">
                 <StickyNote className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-[#A6B1E1] to-[#424874] bg-clip-text text-transparent">
+                <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#A6B1E1] to-[#424874] bg-clip-text text-transparent">
                   QuickNotes
                 </h1>
-                <p className="text-xs text-slate-600 dark:text-slate-400">
+                <p className="text-xs text-slate-600 dark:text-slate-400" aria-live="polite" aria-atomic="true">
                   {filteredNotes.length} {filteredNotes.length === 1 ? 'note' : 'notes'}
                 </p>
               </div>
@@ -109,7 +109,11 @@ export function DashboardClient({ notes: initialNotes, user }: DashboardClientPr
             <div className="flex items-center gap-4">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-11 w-11 rounded-full hover:ring-2 hover:ring-[#A6B1E1]/50 transition-all">
+                  <Button 
+                    variant="ghost" 
+                    className="relative h-11 w-11 rounded-full hover:ring-2 hover:ring-[#A6B1E1]/50 transition-all focus:ring-2 focus:ring-[#A6B1E1] focus:ring-offset-2"
+                    aria-label={`User menu for ${user.name || user.email}`}
+                  >
                     <Avatar className="h-11 w-11">
                       <AvatarFallback className="bg-gradient-to-br from-[#A6B1E1] to-[#424874] text-white font-semibold">
                         {userInitials}
@@ -125,13 +129,13 @@ export function DashboardClient({ notes: initialNotes, user }: DashboardClientPr
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => router.push("/profile")} className="cursor-pointer">
-                    <User className="w-4 h-4 mr-2" />
+                  <DropdownMenuItem onClick={() => router.push("/profile")} className="cursor-pointer focus:bg-slate-100 dark:focus:bg-slate-700">
+                    <User className="w-4 h-4 mr-2" aria-hidden="true" />
                     Profile
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive cursor-pointer">
-                    <LogOut className="w-4 h-4 mr-2" />
+                  <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive cursor-pointer focus:bg-slate-100 dark:focus:bg-slate-700">
+                    <LogOut className="w-4 h-4 mr-2" aria-hidden="true" />
                     Sign out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -142,61 +146,65 @@ export function DashboardClient({ notes: initialNotes, user }: DashboardClientPr
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Search and Create */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8 animate-fade-in">
+        <div className="flex flex-col sm:flex-row gap-4 mb-8 animate-fade-in">
           <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+            <label htmlFor="note-search" className="sr-only">Search notes</label>
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5 pointer-events-none" aria-hidden="true" />
             <Input
+              id="note-search"
               placeholder="Search notes by title, content, or tags..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-12 h-12 text-base border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-[#A6B1E1]/50 bg-white/80 dark:bg-gray-800/80 backdrop-blur"
+              aria-label="Search through your notes"
+              role="searchbox"
             />
           </div>
           <CreateNoteDialog onNoteCreated={handleNoteCreated} />
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur rounded-xl p-6 border border-slate-200/50 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 animate-fade-in" style={{ animationDelay: '0.1s' }} aria-label="Dashboard statistics">
+          <article className="bg-white/80 dark:bg-gray-800/80 backdrop-blur rounded-xl p-6 border border-slate-200/50 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">Total Notes</p>
-                <p className="text-3xl font-bold text-slate-900 dark:text-white mt-1">{notes.length}</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white mt-1" aria-label={`${notes.length} total notes`}>{notes.length}</p>
               </div>
-              <div className="w-12 h-12 bg-[#DCD6F7] dark:bg-blue-900 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-[#DCD6F7] dark:bg-blue-900 rounded-lg flex items-center justify-center" aria-hidden="true">
                 <StickyNote className="w-6 h-6 text-[#424874] dark:text-[#A6B1E1]" />
               </div>
             </div>
-          </div>
+          </article>
           
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur rounded-xl p-6 border border-slate-200/50 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all">
+          <article className="bg-white/80 dark:bg-gray-800/80 backdrop-blur rounded-xl p-6 border border-slate-200/50 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">Tags Used</p>
-                <p className="text-3xl font-bold text-slate-900 dark:text-white mt-1">
+                <p className="text-3xl font-bold text-slate-900 dark:text-white mt-1" aria-label={`${new Set(notes.flatMap(note => note.tags)).size} unique tags`}>
                   {new Set(notes.flatMap(note => note.tags)).size}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-[#F4EEFF] dark:bg-purple-900 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-[#F4EEFF] dark:bg-purple-900 rounded-lg flex items-center justify-center" aria-hidden="true">
                 <Search className="w-6 h-6 text-[#424874] dark:text-[#A6B1E1]" />
               </div>
             </div>
-          </div>
+          </article>
           
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur rounded-xl p-6 border border-slate-200/50 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all">
+          <article className="bg-white/80 dark:bg-gray-800/80 backdrop-blur rounded-xl p-6 border border-slate-200/50 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">Active Searches</p>
-                <p className="text-3xl font-bold text-slate-900 dark:text-white mt-1">{searchQuery ? filteredNotes.length : notes.length}</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white mt-1" aria-label={`${searchQuery ? filteredNotes.length : notes.length} notes shown`}>{searchQuery ? filteredNotes.length : notes.length}</p>
               </div>
-              <div className="w-12 h-12 bg-[#DCD6F7] dark:bg-green-900 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-[#DCD6F7] dark:bg-green-900 rounded-lg flex items-center justify-center" aria-hidden="true">
                 <User className="w-6 h-6 text-[#424874] dark:text-[#A6B1E1]" />
               </div>
             </div>
-          </div>
-        </div>
+          </article>
+        </section>
 
         {/* Notes Grid */}
         {filteredNotes.length === 0 ? (
