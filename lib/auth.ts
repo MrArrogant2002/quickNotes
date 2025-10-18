@@ -21,6 +21,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         try {
           // Validate input
           const { email, password } = loginSchema.parse(credentials)
+          console.log("Login attempt for email:", email)
 
           // Find user in database
           const user = await prisma.user.findUnique({
@@ -28,15 +29,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           })
 
           if (!user) {
+            console.log("User not found:", email)
             throw new Error("Invalid credentials")
           }
+
+          console.log("User found, verifying password...")
 
           // Verify password
           const isPasswordValid = await bcrypt.compare(password, user.password)
 
           if (!isPasswordValid) {
+            console.log("Password verification failed for:", email)
             throw new Error("Invalid credentials")
           }
+
+          console.log("Login successful for:", email)
 
           // Return user object (exclude password)
           return {
