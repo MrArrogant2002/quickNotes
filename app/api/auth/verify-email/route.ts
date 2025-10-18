@@ -27,21 +27,13 @@ export async function GET(req: NextRequest) {
       )
     }
 
-    const now = new Date()
-    await prisma.$runCommandRaw({
-      update: "users",
-      updates: [
-        {
-          q: { _id: { $oid: user.id } },
-          u: {
-            $set: {
-              emailVerified: true,
-              verificationToken: null,
-              updatedAt: { $date: now.toISOString() },
-            },
-          },
-        },
-      ],
+    // Mark email as verified and clear token
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        emailVerified: true,
+        verificationToken: null,
+      },
     })
 
     return NextResponse.json(
