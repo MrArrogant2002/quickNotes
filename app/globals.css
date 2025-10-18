@@ -67,6 +67,24 @@ body {
   }
 }
 
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
 .animate-gradient {
   background-size: 200% 200%;
   animation: gradient 4s ease infinite;
@@ -82,6 +100,15 @@ body {
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Page transition effect */
+.page-transition {
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 /* Smooth scrolling */

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEditor, EditorContent } from "@tiptap/react"
+import { useCallback } from "react"
 import StarterKit from "@tiptap/starter-kit"
 import Placeholder from "@tiptap/extension-placeholder"
 import Link from "@tiptap/extension-link"
@@ -21,6 +22,7 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
+  Loader2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -31,6 +33,14 @@ interface TiptapEditorProps {
 }
 
 export function TiptapEditor({ content, onChange, placeholder = "Start writing..." }: TiptapEditorProps) {
+  // Memoize the onChange callback to prevent unnecessary re-renders
+  const handleUpdate = useCallback(
+    ({ editor }: any) => {
+      onChange(editor.getHTML())
+    },
+    [onChange]
+  )
+
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -60,13 +70,21 @@ export function TiptapEditor({ content, onChange, placeholder = "Start writing..
           "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[300px] max-w-none p-4 text-foreground prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-em:text-foreground prose-code:text-foreground prose-li:text-foreground",
       },
     },
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML())
-    },
+    onUpdate: handleUpdate,
   })
 
   if (!editor) {
-    return null
+    return (
+      <div className="border rounded-lg overflow-hidden">
+        <div className="border-b bg-gray-50 dark:bg-gray-900 p-2 h-[52px] animate-pulse"></div>
+        <div className="min-h-[300px] flex items-center justify-center bg-white dark:bg-gray-950">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="w-8 h-8 animate-spin text-[#A6B1E1]" />
+            <p className="text-sm text-slate-600 dark:text-slate-300">Loading editor...</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   const setLink = () => {

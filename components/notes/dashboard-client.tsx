@@ -34,6 +34,7 @@ export function DashboardClient({ notes: initialNotes, user }: DashboardClientPr
   const router = useRouter()
   const [notes, setNotes] = useState<Note[]>(initialNotes)
   const [searchQuery, setSearchQuery] = useState("")
+  const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null)
 
   const handleNoteCreated = () => {
     router.refresh()
@@ -43,6 +44,8 @@ export function DashboardClient({ notes: initialNotes, user }: DashboardClientPr
     if (!confirm("Are you sure you want to delete this note?")) {
       return
     }
+
+    setDeletingNoteId(noteId)
 
     try {
       const response = await fetch(`/api/notes/${noteId}`, {
@@ -59,6 +62,8 @@ export function DashboardClient({ notes: initialNotes, user }: DashboardClientPr
     } catch (error) {
       console.error("Error deleting note:", error)
       toast.error("Something went wrong")
+    } finally {
+      setDeletingNoteId(null)
     }
   }
 
@@ -112,7 +117,7 @@ export function DashboardClient({ notes: initialNotes, user }: DashboardClientPr
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-gray-800 border border-slate-200 dark:border-slate-700 shadow-xl">
                   <DropdownMenuLabel>
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-semibold">{user.name || "User"}</p>
@@ -220,6 +225,7 @@ export function DashboardClient({ notes: initialNotes, user }: DashboardClientPr
                 <NoteCard
                   {...note}
                   onDelete={handleDeleteNote}
+                  isDeleting={deletingNoteId === note.id}
                 />
               </div>
             ))}

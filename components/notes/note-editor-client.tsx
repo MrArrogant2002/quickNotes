@@ -1,15 +1,34 @@
 "use client"
 
-import { useState } from "react"
+import { useState, Suspense, lazy } from "react"
 import { useRouter } from "next/navigation"
-import { TiptapEditor } from "@/components/editor/tiptap-editor"
+import dynamic from "next/dynamic"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, Save, Trash2, X } from "lucide-react"
+import { ArrowLeft, Save, Trash2, X, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { formatDistanceToNow } from "date-fns"
+
+// Dynamically import TipTap editor to reduce initial bundle size
+const TiptapEditor = dynamic(
+  () => import("@/components/editor/tiptap-editor").then((mod) => ({ default: mod.TiptapEditor })),
+  {
+    loading: () => (
+      <div className="border rounded-lg overflow-hidden">
+        <div className="border-b bg-gray-50 dark:bg-gray-900 p-2 h-[52px] animate-pulse"></div>
+        <div className="min-h-[300px] flex items-center justify-center bg-white dark:bg-gray-950">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="w-8 h-8 animate-spin text-[#A6B1E1]" />
+            <p className="text-sm text-slate-600 dark:text-slate-300">Loading editor...</p>
+          </div>
+        </div>
+      </div>
+    ),
+    ssr: false,
+  }
+)
 
 interface Note {
   id: string
@@ -144,8 +163,17 @@ export function NoteEditorClient({ note }: NoteEditorClientProps) {
               disabled={isDeleting}
               className="shadow-lg"
             >
-              <Trash2 className="w-4 h-4 mr-2" />
-              {isDeleting ? "Deleting..." : "Delete"}
+              {isDeleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete
+                </>
+              )}
             </Button>
 
             <Button
@@ -153,8 +181,17 @@ export function NoteEditorClient({ note }: NoteEditorClientProps) {
               disabled={isSaving}
               className="bg-gradient-to-r from-[#A6B1E1] to-[#424874] hover:from-[#8B9FD9] hover:to-[#333561] text-white shadow-lg shadow-[#A6B1E1]/30"
             >
-              <Save className="w-4 h-4 mr-2" />
-              {isSaving ? "Saving..." : "Save Changes"}
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Changes
+                </>
+              )}
             </Button>
           </div>
         </div>
@@ -220,12 +257,14 @@ export function NoteEditorClient({ note }: NoteEditorClientProps) {
           </CardHeader>
 
           <CardContent className="pt-6">
-            {/* TipTap Editor */}
-            <TiptapEditor
-              content={content}
-              onChange={setContent}
-              placeholder="Start writing your note..."
-            />
+            {/* TipTap Editor with fade-in animation */}
+            <div className="animate-fade-in">
+              <TiptapEditor
+                content={content}
+                onChange={setContent}
+                placeholder="Start writing your note..."
+              />
+            </div>
           </CardContent>
         </Card>
       </div>

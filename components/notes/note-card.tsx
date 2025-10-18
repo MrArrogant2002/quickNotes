@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { MoreVertical, Edit, Trash2, Calendar } from "lucide-react"
+import { MoreVertical, Edit, Trash2, Calendar, Loader2 } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 
 interface NoteCardProps {
@@ -16,25 +16,38 @@ interface NoteCardProps {
   createdAt: string
   updatedAt: string
   onDelete?: (id: string) => void
+  isDeleting?: boolean
 }
 
 // Helper function to strip HTML tags and get plain text
 function stripHtml(html: string): string {
   // Remove HTML tags
   const text = html.replace(/<[^>]*>/g, '')
-  // Decode HTML entities
-  const textarea = document.createElement('textarea')
-  textarea.innerHTML = text
-  return textarea.value
+  // Decode HTML entities (server-safe method)
+  return text
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ')
 }
 
-export function NoteCard({ id, title, content, tags, updatedAt, onDelete }: NoteCardProps) {
+export function NoteCard({ id, title, content, tags, updatedAt, onDelete, isDeleting }: NoteCardProps) {
   // Strip HTML and truncate content for preview
   const plainText = stripHtml(content)
   const preview = plainText.length > 150 ? plainText.substring(0, 150) + "..." : plainText
 
   return (
-    <Card className="group hover:shadow-2xl hover:shadow-[#A6B1E1]/10 transition-all duration-300 hover:-translate-y-1 border-slate-200/50 dark:border-slate-700/50 bg-white/80 dark:bg-gray-800/80 backdrop-blur overflow-hidden">
+    <Card className="group hover:shadow-2xl hover:shadow-[#A6B1E1]/10 transition-all duration-300 hover:-translate-y-1 border-slate-200/50 dark:border-slate-700/50 bg-white/80 dark:bg-gray-800/80 backdrop-blur overflow-hidden relative">
+      {isDeleting && (
+        <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm z-10 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-2">
+            <Loader2 className="w-8 h-8 animate-spin text-[#A6B1E1]" />
+            <p className="text-sm text-slate-600 dark:text-slate-300">Deleting...</p>
+          </div>
+        </div>
+      )}
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -56,7 +69,7 @@ export function NoteCard({ id, title, content, tags, updatedAt, onDelete }: Note
                 <MoreVertical className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="bg-white dark:bg-gray-800 border border-slate-200 dark:border-slate-700 shadow-xl">
               <DropdownMenuItem asChild>
                 <Link href={`/notes/${id}`} className="flex items-center cursor-pointer">
                   <Edit className="w-4 h-4 mr-2" />

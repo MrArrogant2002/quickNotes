@@ -38,10 +38,14 @@ interface ProfileClientProps {
 function stripHtml(html: string): string {
   // Remove HTML tags
   const text = html.replace(/<[^>]*>/g, '')
-  // Decode HTML entities
-  const textarea = document.createElement('textarea')
-  textarea.innerHTML = text
-  return textarea.value
+  // Decode HTML entities (server-safe method)
+  return text
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ')
 }
 
 export function ProfileClient({ user, notes }: ProfileClientProps) {

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { Plus, X } from "lucide-react"
+import { Plus, X, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 interface CreateNoteDialogProps {
@@ -182,7 +182,14 @@ export function CreateNoteDialog({ onNoteCreated }: CreateNoteDialogProps) {
               disabled={isLoading}
               className="bg-gradient-to-r from-[#A6B1E1] to-[#424874] hover:from-[#8B9FD9] hover:to-[#333561] text-white px-6"
             >
-              {isLoading ? "Creating..." : "Create Note"}
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create Note"
+              )}
             </Button>
           </DialogFooter>
         </form>
