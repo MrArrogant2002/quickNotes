@@ -56,18 +56,19 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F4EEFF] via-[#DCD6F7] to-[#A6B1E1] dark:from-gray-900 dark:via-[#424874] dark:to-gray-950 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F4EEFF] via-[#DCD6F7] to-[#A6B1E1] dark:from-gray-900 dark:via-[#424874] dark:to-gray-950 p-4 sm:p-6">
       <div className="w-full max-w-md">
         {/* Back to Home Link */}
         <Link 
           href="/" 
-          className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-[#424874] dark:hover:text-[#A6B1E1] mb-6 transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-[#424874] dark:hover:text-[#A6B1E1] mb-6 transition-colors focus:outline-none focus:ring-2 focus:ring-[#A6B1E1] focus:ring-offset-2 rounded-md"
+          aria-label="Go back to home page"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           Back to home
         </Link>
 
-        <Card className="border-slate-200/50 dark:border-slate-700/50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-2xl shadow-[#A6B1E1]/10">
+        <Card className="border-slate-200/50 dark:border-slate-700/50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-2xl shadow-[#A6B1E1]/10" role="main">
           <CardHeader className="space-y-3 text-center pb-6">
             <div className="w-14 h-14 bg-gradient-to-br from-[#A6B1E1] to-[#424874] rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-[#A6B1E1]/30">
               <FileText className="w-7 h-7 text-white" />
@@ -80,7 +81,7 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5" aria-label="Login form">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-semibold">Email</Label>
                 <Input
@@ -92,6 +93,8 @@ export default function LoginPage() {
                   required
                   disabled={isLoading}
                   className="h-11 border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-[#A6B1E1]/50"
+                  aria-required="true"
+                  autoComplete="email"
                 />
               </div>
               <div className="space-y-2">
@@ -106,16 +109,21 @@ export default function LoginPage() {
                   disabled={isLoading}
                   minLength={6}
                   className="h-11 border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-[#A6B1E1]/50"
+                  aria-required="true"
+                  aria-describedby="password-hint"
+                  autoComplete="current-password"
                 />
+                <p id="password-hint" className="sr-only">Password must be at least 6 characters</p>
               </div>
               <Button 
                 type="submit" 
-                className="w-full h-11 bg-gradient-to-r from-[#A6B1E1] to-[#424874] hover:from-[#8B9FD9] hover:to-[#333561] text-white shadow-lg shadow-[#A6B1E1]/30 hover:shadow-[#A6B1E1]/50 transition-all duration-300" 
+                className="w-full h-11 bg-gradient-to-r from-[#A6B1E1] to-[#424874] hover:from-[#8B9FD9] hover:to-[#333561] text-white shadow-lg shadow-[#A6B1E1]/30 hover:shadow-[#A6B1E1]/50 transition-all duration-300 focus:ring-2 focus:ring-[#A6B1E1] focus:ring-offset-2" 
                 disabled={isLoading}
+                aria-label={isLoading ? "Signing in, please wait" : "Sign in to your account"}
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
                     Signing in...
                   </>
                 ) : (
@@ -127,7 +135,10 @@ export default function LoginPage() {
           <CardFooter className="flex flex-col space-y-2 pb-6">
             <div className="text-sm text-center text-slate-600 dark:text-slate-400">
               Don&apos;t have an account?{" "}
-              <Link href="/register" className="text-[#424874] hover:text-[#333561] dark:text-[#A6B1E1] dark:hover:text-[#8B9FD9] hover:underline font-semibold transition-colors">
+              <Link 
+                href="/register" 
+                className="text-[#424874] hover:text-[#333561] dark:text-[#A6B1E1] dark:hover:text-[#8B9FD9] hover:underline font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[#A6B1E1] rounded"
+              >
                 Sign up
               </Link>
             </div>

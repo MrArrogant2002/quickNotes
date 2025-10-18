@@ -67,20 +67,21 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F4EEFF] via-[#DCD6F7] to-[#A6B1E1] dark:from-gray-900 dark:via-[#424874] dark:to-gray-950 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F4EEFF] via-[#DCD6F7] to-[#A6B1E1] dark:from-gray-900 dark:via-[#424874] dark:to-gray-950 p-4 sm:p-6">
       <div className="w-full max-w-md">
         {/* Back to Home Link */}
         <Link 
           href="/" 
-          className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-[#424874] dark:hover:text-blue-400 mb-6 transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-[#424874] dark:hover:text-[#A6B1E1] mb-6 transition-colors focus:outline-none focus:ring-2 focus:ring-[#A6B1E1] focus:ring-offset-2 rounded-md"
+          aria-label="Go back to home page"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           Back to home
         </Link>
 
-        <Card className="border-slate-200/50 dark:border-slate-700/50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-2xl">
+        <Card className="border-slate-200/50 dark:border-slate-700/50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-2xl" role="main">
           <CardHeader className="space-y-3 text-center pb-6">
-            <div className="w-14 h-14 bg-gradient-to-br from-[#A6B1E1] to-[#424874] rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-[#A6B1E1]/30">
+            <div className="w-14 h-14 bg-gradient-to-br from-[#A6B1E1] to-[#424874] rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-[#A6B1E1]/30" aria-hidden="true">
               <FileText className="w-7 h-7 text-white" />
             </div>
             <CardTitle className="text-3xl font-bold bg-gradient-to-r from-[#A6B1E1] to-[#424874] bg-clip-text text-transparent">
@@ -91,7 +92,7 @@ export default function RegisterPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" aria-label="Registration form">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-semibold">Name</Label>
                 <Input
@@ -103,8 +104,12 @@ export default function RegisterPage() {
                   required
                   disabled={isLoading}
                   minLength={2}
-                  className="h-11 border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500/50"
+                  className="h-11 border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-[#A6B1E1]/50"
+                  aria-required="true"
+                  aria-describedby="name-hint"
+                  autoComplete="name"
                 />
+                <p id="name-hint" className="sr-only">Enter your full name, minimum 2 characters</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-semibold">Email</Label>
@@ -116,7 +121,9 @@ export default function RegisterPage() {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
                   disabled={isLoading}
-                  className="h-11 border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500/50"
+                  className="h-11 border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-[#A6B1E1]/50"
+                  aria-required="true"
+                  autoComplete="email"
                 />
               </div>
               <div className="space-y-2">
@@ -130,9 +137,12 @@ export default function RegisterPage() {
                   required
                   disabled={isLoading}
                   minLength={6}
-                  className="h-11 border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500/50"
+                  className="h-11 border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-[#A6B1E1]/50"
+                  aria-required="true"
+                  aria-describedby="password-requirement"
+                  autoComplete="new-password"
                 />
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p id="password-requirement" className="text-xs text-slate-500 dark:text-slate-400">
                   Minimum 6 characters
                 </p>
               </div>
@@ -140,46 +150,51 @@ export default function RegisterPage() {
                 <Label htmlFor="confirmPassword" className="text-sm font-semibold">Confirm Password</Label>
                 <Input
                   id="confirmPassword"
-                type="password"
-                placeholder="••••••••"
+                  type="password"
+                  placeholder="••••••••"
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   required
                   disabled={isLoading}
                   minLength={6}
-                  className="h-11 border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500/50"
+                  className="h-11 border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-[#A6B1E1]/50"
+                  aria-required="true"
+                  aria-describedby="confirm-password-hint"
+                  autoComplete="new-password"
                 />
+                <p id="confirm-password-hint" className="sr-only">Re-enter your password to confirm</p>
               </div>
 
               {/* Features List */}
-              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4 space-y-2">
+              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4 space-y-2" role="complementary" aria-label="Account benefits">
                 <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                   What you&apos;ll get:
                 </p>
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                <ul className="space-y-1.5" role="list">
+                  <li className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" aria-hidden="true" />
                     <span>Unlimited notes with rich text editing</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" aria-hidden="true" />
                     <span>Smart tagging and powerful search</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" aria-hidden="true" />
                     <span>Secure encryption and privacy</span>
-                  </div>
-                </div>
+                  </li>
+                </ul>
               </div>
 
               <Button 
                 type="submit" 
-                className="w-full h-11 bg-gradient-to-r from-[#A6B1E1] to-[#424874] hover:from-[#8B9FD9] hover:to-[#333561] text-white shadow-lg shadow-[#A6B1E1]/30 hover:shadow-[#A6B1E1]/50 transition-all duration-300" 
+                className="w-full h-11 bg-gradient-to-r from-[#A6B1E1] to-[#424874] hover:from-[#8B9FD9] hover:to-[#333561] text-white shadow-lg shadow-[#A6B1E1]/30 hover:shadow-[#A6B1E1]/50 transition-all duration-300 focus:ring-2 focus:ring-[#A6B1E1] focus:ring-offset-2" 
                 disabled={isLoading}
+                aria-label={isLoading ? "Creating your account, please wait" : "Create your account"}
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
                     Creating account...
                   </>
                 ) : (
@@ -191,7 +206,10 @@ export default function RegisterPage() {
           <CardFooter className="flex flex-col space-y-2 pb-6">
             <div className="text-sm text-center text-slate-600 dark:text-slate-400">
               Already have an account?{" "}
-              <Link href="/login" className="text-[#424874] hover:text-[#333561] dark:text-[#A6B1E1] dark:hover:text-[#8B9FD9] hover:underline font-semibold transition-colors">
+              <Link 
+                href="/login" 
+                className="text-[#424874] hover:text-[#333561] dark:text-[#A6B1E1] dark:hover:text-[#8B9FD9] hover:underline font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[#A6B1E1] rounded"
+              >
                 Sign in
               </Link>
             </div>
