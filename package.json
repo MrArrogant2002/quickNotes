@@ -1,6 +1,33 @@
 {
   "name": "quicknotes",
   "version": "0.1.0",
+  "description": "A modern, secure, and feature-rich note-taking application built with Next.js 15, MongoDB, and TipTap rich text editor",
+  "author": "MrArrogant2002",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MrArrogant2002/quickNotes.git"
+  },
+  "homepage": "https://github.com/MrArrogant2002/quickNotes#readme",
+  "bugs": {
+    "url": "https://github.com/MrArrogant2002/quickNotes/issues"
+  },
+  "keywords": [
+    "nextjs",
+    "react",
+    "typescript",
+    "mongodb",
+    "notes",
+    "note-taking",
+    "tiptap",
+    "rich-text-editor",
+    "nextauth",
+    "prisma"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
