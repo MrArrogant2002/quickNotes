@@ -337,10 +337,32 @@ This project is licensed under the MIT License.
 
 ## 📚 Documentation
 
-- [Getting Started](./README.md) - This file
-- [Docker Setup](./DOCKER.md) - Docker configuration and deployment
-- [MongoDB Fix](./MONGODB_FIX.md) - MongoDB replica set workaround
-- [Testing](./TESTING.md) - Testing documentation
+All documentation has been organized in the `docs/` folder:
+
+### **Getting Started**
+- [Quick Start Guide](./docs/QUICKSTART.md) - Get up and running quickly
+- [Features Overview](./docs/FEATURES.md) - Complete feature list
+- [Testing Guide](./docs/TESTING.md) - How to test the application
+
+### **Deployment**
+- [Deployment Guide](./docs/DEPLOYMENT.md) - Deploy to Vercel or other platforms
+
+### **Email & Authentication**
+- [Email Setup Guide](./docs/EMAIL_SETUP_GUIDE.md) - Configure Resend email service
+- [Email Implementation](./docs/EMAIL_IMPLEMENTATION_COMPLETE.md) - Email feature details
+- [Password Reset Guide](./docs/PASSWORD_RESET_TESTING_GUIDE.md) - Test password reset
+- [Password Change Feature](./docs/PASSWORD_CHANGE_FEATURE.md) - Inline password change
+- [Login Troubleshooting](./docs/LOGIN_TROUBLESHOOTING.md) - Fix login issues
+
+### **Architecture & Design**
+- [File Structure Guide](./docs/FILE_STRUCTURE_GUIDE.md) - Project organization
+- [UI/UX Enhancements](./docs/UI_UX_ENHANCEMENT.md) - Design improvements
+- [Accessibility](./docs/ACCESSIBILITY_IMPROVEMENTS.md) - A11y features
+- [Editor Optimization](./docs/EDITOR_OPTIMIZATION.md) - Rich text editor details
+
+### **Maintenance**
+- [Optimization Complete](./docs/OPTIMIZATION_COMPLETE.md) - Recent cleanup summary
+- [Cleanup Plan](./docs/CLEANUP_PLAN.md) - Folder optimization details
 
 ## 🗺️ Roadmap
 
@@ -348,13 +370,17 @@ This project is licensed under the MIT License.
 - [x] Rich text editor
 - [x] Note CRUD operations
 - [x] Profile page
-- [x] Docker configuration
-- [ ] Note sharing and collaboration
-- [ ] Export notes (PDF, Markdown)
+- [x] Password reset functionality
+- [x] Email notifications (Resend)
+- [x] Note sharing with public links
+- [x] Inline password change
+- [x] Optimized folder structure
+- [ ] Note export (PDF, Markdown)
 - [ ] Note templates
 - [ ] Dark/Light theme toggle
+- [ ] Email verification
+- [ ] Note versioning
 - [ ] Mobile app (React Native)
-- [ ] Browser extension
 
 ---
 

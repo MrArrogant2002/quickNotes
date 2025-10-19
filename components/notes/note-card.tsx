@@ -6,8 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { MoreVertical, Edit, Trash2, Calendar, Loader2 } from "lucide-react"
+import { MoreVertical, Edit, Trash2, Calendar, Loader2, Share2, Check } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
+import { toast } from "sonner"
 
 interface NoteCardProps {
   id: string
@@ -18,6 +19,8 @@ interface NoteCardProps {
   updatedAt: string
   onDelete?: (id: string) => void
   isDeleting?: boolean
+  shareToken?: string | null
+  isPublic?: boolean
 }
 
 // Helper function to strip HTML tags and get plain text
@@ -34,13 +37,15 @@ function stripHtml(html: string): string {
     .replace(/&nbsp;/g, ' ')
 }
 
-export function NoteCard({ id, title, content, tags, updatedAt, onDelete, isDeleting }: NoteCardProps) {
+export function NoteCard({ id, title, content, tags, updatedAt, onDelete, isDeleting, shareToken, isPublic }: NoteCardProps) {
   // Strip HTML and truncate content for preview
   const plainText = stripHtml(content)
   const preview = plainText.length > 150 ? plainText.substring(0, 150) + "..." : plainText
 
   // Use client-side only rendering for time to avoid hydration mismatch
   const [timeAgo, setTimeAgo] = useState<string>("")
+  const [isSharing, setIsSharing] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     setTimeAgo(formatDistanceToNow(new Date(updatedAt), { addSuffix: true }))
@@ -52,6 +57,106 @@ export function NoteCard({ id, title, content, tags, updatedAt, onDelete, isDele
 
     return () => clearInterval(interval)
   }, [updatedAt])
+
+  // Safe clipboard copy function
+  const copyToClipboard = async (text: string): Promise<boolean> => {
+    try {
+      // Check if clipboard API is available
+      if (navigator?.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text)
+        return true
+      } else {
+        // Fallback method for non-secure contexts or older browsers
+        const textArea = document.createElement('textarea')
+        textArea.value = text
+        textArea.style.position = 'fixed'
+        textArea.style.left = '-999999px'
+        textArea.style.top = '-999999px'
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        const successful = document.execCommand('copy')
+        textArea.remove()
+        return successful
+      }
+    } catch (error) {
+      console.error('Failed to copy to clipboard:', error)
+      return false
+    }
+  }
+
+  const handleShare = async () => {
+    setIsSharing(true)
+    try {
+      const res = await fetch('/api/notes/share', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ noteId: id }),
+      })
+
+      const data = await res.json()
+
+      if (res.ok && data.shareUrl) {
+        const copied = await copyToClipboard(data.shareUrl)
+        if (copied) {
+          setCopied(true)
+          toast.success('Share link copied to clipboard!')
+          setTimeout(() => setCopied(false), 2000)
+        } else {
+          toast.success('Note shared! Link: ' + data.shareUrl, { duration: 5000 })
+        }
+        // Refresh the page to update the share status
+        window.location.reload()
+      } else {
+        toast.error(data.error || 'Failed to generate share link')
+      }
+    } catch (error) {
+      console.error('Share error:', error)
+      toast.error('Failed to share note')
+    } finally {
+      setIsSharing(false)
+    }
+  }
+
+  const handleUnshare = async () => {
+    setIsSharing(true)
+    try {
+      const res = await fetch('/api/notes/share', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ noteId: id }),
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        toast.success('Note is now private')
+        // Refresh the page to update the share status
+        window.location.reload()
+      } else {
+        toast.error(data.error || 'Failed to unshare note')
+      }
+    } catch (error) {
+      console.error('Unshare error:', error)
+      toast.error('Failed to unshare note')
+    } finally {
+      setIsSharing(false)
+    }
+  }
+
+  const handleCopyLink = async () => {
+    if (shareToken) {
+      const shareUrl = `${window.location.origin}/shared/${shareToken}`
+      const copied = await copyToClipboard(shareUrl)
+      if (copied) {
+        setCopied(true)
+        toast.success('Share link copied!')
+        setTimeout(() => setCopied(false), 2000)
+      } else {
+        toast.error('Failed to copy link. Please try again.')
+      }
+    }
+  }
 
   return (
     <Card className="group hover:shadow-2xl hover:shadow-[#A6B1E1]/10 transition-all duration-300 hover:-translate-y-1 border-slate-200/50 dark:border-slate-700/50 bg-white/80 dark:bg-gray-800/80 backdrop-blur overflow-hidden relative" role="article" aria-label={`Note: ${title}`}>
@@ -96,6 +201,44 @@ export function NoteCard({ id, title, content, tags, updatedAt, onDelete, isDele
                   Edit
                 </Link>
               </DropdownMenuItem>
+              {isPublic && shareToken ? (
+                <>
+                  <DropdownMenuItem
+                    onClick={handleCopyLink}
+                    disabled={isSharing}
+                    className="cursor-pointer focus:bg-slate-100 dark:focus:bg-slate-700"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-4 h-4 mr-2 text-green-600" aria-hidden="true" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Share2 className="w-4 h-4 mr-2" aria-hidden="true" />
+                        Copy Link
+                      </>
+                    )}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleUnshare}
+                    disabled={isSharing}
+                    className="cursor-pointer focus:bg-slate-100 dark:focus:bg-slate-700"
+                  >
+                    <Share2 className="w-4 h-4 mr-2" aria-hidden="true" />
+                    {isSharing ? 'Unsharing...' : 'Make Private'}
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <DropdownMenuItem
+                  onClick={handleShare}
+                  disabled={isSharing}
+                  className="cursor-pointer focus:bg-slate-100 dark:focus:bg-slate-700"
+                >
+                  <Share2 className="w-4 h-4 mr-2" aria-hidden="true" />
+                  {isSharing ? 'Sharing...' : 'Share'}
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem
                 onClick={() => onDelete?.(id)}
                 className="text-destructive focus:text-destructive cursor-pointer focus:bg-slate-100 dark:focus:bg-slate-700"

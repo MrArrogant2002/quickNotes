@@ -39,7 +39,24 @@ export default function LoginPage() {
 
       if (result?.error) {
         console.error("❌ Login failed:", result.error)
-        toast.error("Invalid email or password")
+        
+        // More specific error messages
+        if (result.error === "CredentialsSignin") {
+          toast.error("Invalid email or password. Please try again.", {
+            description: "Make sure your email and password are correct.",
+            duration: 4000,
+          })
+        } else if (result.error === "Configuration") {
+          toast.error("Server configuration error", {
+            description: "Please contact support.",
+            duration: 4000,
+          })
+        } else {
+          toast.error("Login failed", {
+            description: result.error,
+            duration: 4000,
+          })
+        }
       } else if (result?.ok) {
         console.log("✅ Login successful!")
         toast.success("Welcome back!")
@@ -98,7 +115,15 @@ export default function LoginPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-semibold">Password</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-sm font-semibold">Password</Label>
+                  <Link
+                    href="/forgot-password"
+                    className="text-xs text-[#424874] hover:text-[#333561] dark:text-[#A6B1E1] dark:hover:text-[#8B9FD9] hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-[#A6B1E1] rounded"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
                 <Input
                   id="password"
                   type="password"

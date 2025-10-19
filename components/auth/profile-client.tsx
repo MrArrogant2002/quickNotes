@@ -4,11 +4,14 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Calendar, FileText, Mail } from "lucide-react"
+import { ArrowLeft, Calendar, FileText, Mail, Eye, EyeOff, Lock } from "lucide-react"
 import { formatDistanceToNow, format } from "date-fns"
+import { toast } from "sonner"
 
 interface Note {
   id: string
@@ -72,12 +75,63 @@ function stripHtml(html: string): string {
 
 export function ProfileClient({ user, notes }: ProfileClientProps) {
   const router = useRouter()
+  const [showPasswordChange, setShowPasswordChange] = useState(false)
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  })
 
   const userInitials = user.name
     ?.split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase() || user.email[0].toUpperCase()
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error("New passwords do not match")
+      return
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters")
+      return
+    }
+
+    setIsChangingPassword(true)
+
+    try {
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        toast.success("Password changed successfully!")
+        setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" })
+        setShowPasswordChange(false)
+      } else {
+        toast.error(data.error || "Failed to change password")
+      }
+    } catch (error) {
+      console.error("Error changing password:", error)
+      toast.error("An error occurred. Please try again.")
+    } finally {
+      setIsChangingPassword(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F4EEFF] via-[#DCD6F7] to-[#A6B1E1] dark:from-gray-900 dark:via-[#424874] dark:to-gray-950">
@@ -133,6 +187,129 @@ export function ProfileClient({ user, notes }: ProfileClientProps) {
                   <div className="text-sm text-slate-600 dark:text-slate-400 font-medium mt-1">Tags</div>
                 </div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Security Settings */}
+        <Card className="mb-8 border-slate-200/50 dark:border-slate-700/50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-xl">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-slate-900 dark:text-white">
+              Account Security
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {!showPasswordChange ? (
+              <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#A6B1E1] to-[#424874] rounded-lg flex items-center justify-center">
+                    <Lock className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-slate-900 dark:text-white">Password</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                      Change your password to keep your account secure
+                    </p>
+                  </div>
+                </div>
+                <Button 
+                  onClick={() => setShowPasswordChange(true)}
+                  className="bg-gradient-to-r from-[#A6B1E1] to-[#424874] hover:from-[#8B9FD9] hover:to-[#333561] text-white"
+                >
+                  Change Password
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handlePasswordChange} className="space-y-4 p-6 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                <div className="space-y-2">
+                  <Label htmlFor="currentPassword">Current Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="currentPassword"
+                      type={showCurrentPassword ? "text" : "password"}
+                      placeholder="Enter current password"
+                      value={passwordData.currentPassword}
+                      onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                      required
+                      disabled={isChangingPassword}
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                    >
+                      {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">New Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="newPassword"
+                      type={showNewPassword ? "text" : "password"}
+                      placeholder="Enter new password (min 6 characters)"
+                      value={passwordData.newPassword}
+                      onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                      required
+                      minLength={6}
+                      disabled={isChangingPassword}
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                    >
+                      {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="Confirm new password"
+                    value={passwordData.confirmPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                    required
+                    minLength={6}
+                    disabled={isChangingPassword}
+                  />
+                  {passwordData.confirmPassword && passwordData.newPassword !== passwordData.confirmPassword && (
+                    <p className="text-xs text-red-500">Passwords do not match</p>
+                  )}
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    type="submit"
+                    disabled={isChangingPassword || passwordData.newPassword !== passwordData.confirmPassword}
+                    className="flex-1 bg-gradient-to-r from-[#A6B1E1] to-[#424874] hover:from-[#8B9FD9] hover:to-[#333561] text-white"
+                  >
+                    {isChangingPassword ? "Changing..." : "Change Password"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowPasswordChange(false)
+                      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" })
+                    }}
+                    disabled={isChangingPassword}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            )}
+
+            <div className="text-xs text-slate-500 dark:text-slate-400 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              💡 <strong>Tip:</strong> Use a strong password with at least 8 characters, including uppercase, lowercase, numbers, and special characters.
             </div>
           </CardContent>
         </Card>

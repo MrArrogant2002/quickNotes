@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
+import { sendWelcomeEmail } from "@/lib/email"
 
 // Validation schema for registration
 const registerSchema = z.object({
@@ -51,6 +52,15 @@ export async function POST(req: NextRequest) {
     })
 
     console.log("User created successfully:", user.email)
+
+    // Send welcome email
+    try {
+      await sendWelcomeEmail(user.email, user.name || user.email.split('@')[0])
+      console.log(`✅ Welcome email sent to: ${user.email}`)
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError)
+      // Don't fail registration if email fails
+    }
 
     return NextResponse.json(
       {

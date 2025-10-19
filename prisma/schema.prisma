@@ -44,19 +44,3 @@ model Note {
   @@index([userId])
   @@index([shareToken])
 }
-
-// NoteVersion model for version history
-model NoteVersion {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  noteId    String   @db.ObjectId // Reference to the note
-  title     String
-  content   String
-  tags      String[]
-  version   Int      // Version number
-  userId    String   @db.ObjectId // User who created this version
-  createdAt DateTime @default(now())
-
-  @@map("note_versions")
-  @@index([noteId])
-  @@index([userId])
-}

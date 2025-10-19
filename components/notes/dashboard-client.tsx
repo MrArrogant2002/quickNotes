@@ -19,6 +19,8 @@ interface Note {
   tags: string[]
   createdAt: string
   updatedAt: string
+  shareToken?: string | null
+  isPublic?: boolean
 }
 
 interface DashboardClientProps {
