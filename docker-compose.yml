@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: quicknotes-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: quicknotes
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - quicknotes-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/quicknotes --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Next.js Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quicknotes-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=mongodb://mongodb:27017/quicknotes
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL:-onboarding@resend.dev}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - quicknotes-network
+    volumes:
+      - ./prisma:/app/prisma
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  quicknotes-network:
+    driver: bridge

@@ -75,6 +75,16 @@ A modern, secure, and feature-rich note-taking application built with Next.js 15
 - MongoDB running locally or Docker installed
 - pnpm installed (`npm install -g pnpm`)
 
+### CI/CD
+
+This project includes GitHub Actions workflows for:
+- **Linting** - ESLint code quality checks
+- **Type Checking** - TypeScript validation
+- **Building** - Next.js build verification
+- **Security Audit** - Dependency vulnerability scanning
+
+See [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) for details.
+
 ### Local Development Setup
 
 1. **Clone the repository**
@@ -311,21 +321,33 @@ docker-compose down     # Stop Docker containers
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please:
+Contributions are welcome! Please read our [Contributing Guidelines](./CONTRIBUTING.md) before submitting a Pull Request.
+
+### Quick Start for Contributors
+
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+Please ensure your PR:
+- Follows the code style (run `pnpm lint`)
+- Includes relevant tests if applicable
+- Updates documentation as needed
+
+## 🔒 Security
+
+For security concerns, please review our [Security Policy](./SECURITY.md).
+
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
 ## 👨‍💻 Author
 
-**Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
+**MrArrogant2002**
+- GitHub: [@MrArrogant2002](https://github.com/MrArrogant2002)
 
 ## 🙏 Acknowledgments
 
